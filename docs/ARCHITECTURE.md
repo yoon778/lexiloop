@@ -10,8 +10,11 @@
 - 음성: Android TextToSpeech, `Locale.US`
 - 알림: 부정확 알람, 설정 시각 근처 하루 1회
 - AI: Gemini API, 개인 베타에서만 앱 개발 설정을 통해 접근
+- SDK: `minSdk 26`, `compileSdk 37`, `targetSdk 36`
+- 빌드: AGP 9.2.1, Gradle 9.4.1, JDK 21, Java toolchain 17
+- 구조: 단일 `app` 모듈, 수동 생성자 주입
 
-아직 버전 번호와 최소 Android 버전은 확정하지 않음
+세부 버전은 `docs/TECH_STACK.md` 참조
 
 ## 계층
 
@@ -164,9 +167,7 @@ DataStore
 
 ## 미확정 기술 조사
 
-- 최소 Android SDK와 target SDK
 - 오픈 라이선스 영한 데이터 출처
 - Gemini 안정 모델과 정확한 호출 제한
 - 알림 예약 API 세부 구현
-- Room 스키마와 마이그레이션 정책
 - 공개 버전 백엔드와 로그인 방식

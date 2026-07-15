@@ -2,12 +2,12 @@
 
 - 현재 단계: 상세 로직 설계 진행, 개발 미시작
 - 현재 담당자: 없음
-- 현재 작업: Gemini JSON 계약 확정
-- 마지막 완료: Room 데이터 모델 상세 설계 확정
-- 수정 중인 파일: `docs/GEMINI_SCHEMA.md`, `coordination/CURRENT.md`, `coordination/TASKS.md`
-- 실행한 테스트: JSON 예제 4개 실제 파싱, Room 컬럼 매핑·AI 운영 규칙 대조, `rg` 일관성 확인, `git diff --check`
-- 미완료 부분: 잠긴 빈 `english` 루트 폴더 삭제, Android SDK·의존성 버전 등 나머지 기술 조사·설계, Android 프로젝트 생성
-- 다음 행동: Android SDK·JDK·Gradle·의존성 버전 결정
+- 현재 작업: Android 기술 스택 확정
+- 마지막 완료: Android SDK·빌드 도구·의존성 버전 결정
+- 수정 중인 파일: `docs/TECH_STACK.md`, `docs/DECISIONS.md`, `docs/ARCHITECTURE.md`, `coordination/CURRENT.md`, `coordination/TASKS.md`
+- 실행한 테스트: API 36·37 `android.jar`, Build Tools 36 `aapt2.exe` 실재 확인, `git diff --check`
+- 미완료 부분: 잠긴 빈 `english` 루트 폴더 삭제, 영한 데이터 출처·라이선스 조사, 나머지 상세 설계, Android 프로젝트 생성
+- 다음 행동: 영한 데이터 출처와 라이선스 조사
 - Git 상태: `main`, 원격 `origin`
 - 마지막 커밋: `git log -1` 기준
 - 원격 푸시: `https://github.com/yoon778/lexiloop`의 `main`
@@ -16,7 +16,7 @@
 ## 로컬 작업공간
 
 - 새 기준 경로: `C:\Users\cys04\Desktop\APPS\lexiloop`
-- Android Studio 설치 완료. SDK·JDK 경로와 버전은 프로젝트 생성 전 확인 예정
+- Android Studio·SDK·JDK 경로와 버전 확인 완료
 - 기존 폴더 내부는 모두 삭제되어 빈 상태
 - 프로세스 명령줄 경로 검색 결과 0건이나 디렉터리 핸들 점유는 지속
 

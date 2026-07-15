@@ -13,7 +13,7 @@
 - [x] `completed` Codex·Claude 역할 분리
 - [x] `completed` 인수인계 문서 구조 정의
 - [ ] `pending` 영한 데이터 출처와 라이선스 조사
-- [ ] `pending` 최소 Android SDK와 의존성 버전 결정
+- [x] `completed` 최소 Android SDK와 의존성 버전 결정
 - [ ] `pending` 화면별 와이어프레임
 - [x] `completed` Room 데이터 모델 상세 설계
 - [x] `completed` 학습·복습 상태 전이표 작성

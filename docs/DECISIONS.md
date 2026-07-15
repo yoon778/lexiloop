@@ -72,6 +72,19 @@
 - 발음기호·출처·라이선스·ID·`contentKey`는 앱과 사전 계층에서 보완
 - 프롬프트와 원시 응답 로그 금지
 
+## Android 기술 스택
+
+- application ID는 `com.yoon778.lexiloop`
+- `minSdk 26`, `compileSdk 37`, `targetSdk 36`
+- AGP 9.2.1, Gradle 9.4.1, AGP 내장 Kotlin 2.3.10 사용
+- Gradle은 JDK 21로 실행하고 Java toolchain은 17로 고정
+- 단일 `app` 모듈과 수동 생성자 주입 사용
+- Compose BOM 2026.06.00과 안정 AndroidX만 사용
+- Navigation 3, Room 2.8.4, Typed DataStore 1.2.1 사용
+- Gemini는 개인 베타에서 REST와 `HttpURLConnection`으로 호출
+- 알림·음성·파일 처리는 Android 플랫폼 API 우선
+- 상세 버전과 제외 항목은 `docs/TECH_STACK.md` 참조
+
 ## 성과
 
 - 연속 학습일
