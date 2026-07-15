@@ -34,8 +34,8 @@
 
 - [x] `completed` 정답 정규화·학습·복습 순수 도메인 로직
 - [x] `completed` Room 엔티티·DAO·트랜잭션 저장소
-- [ ] `in_progress` DataStore 설정 저장소
-- [ ] `pending` Gemini REST·JSON 검증
+- [x] `completed` DataStore 설정 저장소
+- [ ] `in_progress` Gemini REST·JSON 검증
 - [ ] `pending` 알림 예약·재예약
 - [ ] `pending` Android TextToSpeech
 - [ ] `pending` ViewModel·UiState·UiEvent 계약 구현
