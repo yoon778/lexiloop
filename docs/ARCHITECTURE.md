@@ -62,9 +62,17 @@ Compose UI
 - `ReviewSchedule`: 다음 복습일과 간격 단계
 - `RecommendationProfile`: 관심 분야, 비율, 난이도, 제외 분야
 - `RecommendationQueue`: 아직 학습하지 않은 추천 항목
-- `ExcludedItem`: 다시 추천하지 않을 항목
 - `ErrorNote`: 뜻·예문 오류 메모
 - `DailySession`: 날짜별 신규·복습 세션
+
+Room 구체화
+
+- `LearningItem`에 목표 뜻과 예문 포함
+- `LearningProgress`에 추천 순서, 복습 일정, 독립 제외 시각 포함
+- 별도 추천 대기열·복습 일정·제외 테이블 없음
+- 원시 문제 시도 이력 없이 현재 세션 복구 상태만 저장
+- UUID 문자열 ID 사용
+- 상세 스키마는 `docs/DATA_MODEL.md` 참조
 
 ## 정답 정규화
 
