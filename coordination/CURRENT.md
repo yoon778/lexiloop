@@ -2,12 +2,12 @@
 
 - 현재 단계: Android 구현
 - 현재 담당자: Codex
-- 현재 작업: 정답 정규화·학습·복습 순수 도메인 로직 구현
-- 마지막 완료: 기본 Android 프로젝트 생성과 첫 debug 빌드
-- 수정 중인 파일: Gradle 프로젝트, `app`, 개발 문서, coordination 문서
-- 실행한 테스트: `.\gradlew.bat assembleDebug test` 성공
+- 현재 작업: Room 엔티티·DAO·트랜잭션 저장소 구현
+- 마지막 완료: 순수 도메인 로직과 단위 테스트 17개
+- 수정 중인 파일: `app/src/main`, `app/src/test`, coordination 문서
+- 실행한 테스트: `.\gradlew.bat testDebugUnitTest` 성공, 17개 통과
 - 미완료 부분: 잠긴 빈 `english` 루트 폴더 삭제, Codex 담당 로직·테스트, Claude UI 인수인계
-- 다음 행동: 순수 Kotlin 도메인 모델과 상태 전이 단위 테스트 작성
+- 다음 행동: 확정된 6개 Room 테이블과 핵심 트랜잭션 구현
 - Git 상태: `main`, 원격 `origin`
 - 마지막 커밋: `git log -1` 기준
 - 원격 푸시: `https://github.com/yoon778/lexiloop`의 `main`

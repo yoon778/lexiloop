@@ -32,8 +32,8 @@
 
 ## 구현
 
-- [ ] `in_progress` 정답 정규화·학습·복습 순수 도메인 로직
-- [ ] `pending` Room 엔티티·DAO·트랜잭션 저장소
+- [x] `completed` 정답 정규화·학습·복습 순수 도메인 로직
+- [ ] `in_progress` Room 엔티티·DAO·트랜잭션 저장소
 - [ ] `pending` DataStore 설정 저장소
 - [ ] `pending` Gemini REST·JSON 검증
 - [ ] `pending` 알림 예약·재예약
