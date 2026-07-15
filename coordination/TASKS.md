@@ -36,5 +36,5 @@
 - [x] `completed` 알림 예약·재예약
 - [x] `completed` Android TextToSpeech
 - [x] `completed` ViewModel·UiState·UiEvent 계약 구현
-- [ ] `in_progress` 전체 단위·통합 테스트
-- [ ] `pending` Claude Compose UI 인계
+- [x] `completed` 전체 단위·통합 테스트
+- [ ] `in_progress` Claude Compose UI 인계
