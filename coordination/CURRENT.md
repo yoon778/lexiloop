@@ -1,13 +1,13 @@
 # 현재 상태
 
-- 현재 단계: 상세 로직 설계 진행, 개발 미시작
-- 현재 담당자: 없음
-- 현재 작업: Android 기술 스택 확정
-- 마지막 완료: Android SDK·빌드 도구·의존성 버전 결정
-- 수정 중인 파일: `docs/TECH_STACK.md`, `docs/DECISIONS.md`, `docs/ARCHITECTURE.md`, `coordination/CURRENT.md`, `coordination/TASKS.md`
-- 실행한 테스트: API 36·37 `android.jar`, Build Tools 36 `aapt2.exe` 실재 확인, `git diff --check`
-- 미완료 부분: 잠긴 빈 `english` 루트 폴더 삭제, 영한 데이터 출처·라이선스 조사, 나머지 상세 설계, Android 프로젝트 생성
-- 다음 행동: 영한 데이터 출처와 라이선스 조사
+- 현재 단계: 상세 기획 완료, Android 프로젝트 생성 준비
+- 현재 담당자: Codex
+- 현재 작업: 기획 문서 확정 후 Android 프로젝트 생성
+- 마지막 완료: 데이터 출처·UI 계약·베타·출시 체크리스트 확정
+- 수정 중인 파일: `docs/DATA_SOURCES.md`, `docs/UI_CONTRACT.md`, `docs/BETA_CHECKLIST.md`, `docs/PLAY_STORE_CHECKLIST.md`와 관련 문서
+- 실행한 테스트: 공식 라이선스 원문 대조, Wiktionary JSONL 17,781개 구조 검사, 문서 일관성 `rg`, `git diff --check`
+- 미완료 부분: 잠긴 빈 `english` 루트 폴더 삭제, Android 프로젝트 생성, Codex 담당 로직 구현, Claude UI 인수인계
+- 다음 행동: 기획 문서 커밋 후 기본 Android 프로젝트 생성·빌드
 - Git 상태: `main`, 원격 `origin`
 - 마지막 커밋: `git log -1` 기준
 - 원격 푸시: `https://github.com/yoon778/lexiloop`의 `main`

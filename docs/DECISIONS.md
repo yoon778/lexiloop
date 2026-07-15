@@ -85,6 +85,17 @@
 - 알림·음성·파일 처리는 Android 플랫폼 API 우선
 - 상세 버전과 제외 항목은 `docs/TECH_STACK.md` 참조
 
+## 영한 데이터
+
+- 한국어 위키낱말사전 원본 덤프를 Wiktextract로 구조화한 raw JSONL 사용
+- `lang_code = "en"`인 텍스트 정보만 빌드 전에 추출·검수
+- CC BY-SA 조건에 따라 출처·라이선스·변경 여부 보존
+- 앱 코드와 사전 콘텐츠 라이선스 분리
+- 발음 파일·이미지 등 멀티미디어는 포함하지 않고 Android TextToSpeech 사용
+- 기본 오프라인 단어장은 검수된 일상 영어 300개
+- 한국어기초사전·유료 사전·출처 불명 재가공 데이터는 MVP에 혼합하지 않음
+- 상세 기준은 `docs/DATA_SOURCES.md` 참조
+
 ## 성과
 
 - 연속 학습일
@@ -99,3 +110,12 @@
 - 단일 `main` 브랜치
 - 완료된 작업은 검증 후 커밋·푸시
 - `CURRENT.md`, 요청 파일, 인수인계 문서로 상태 공유
+
+## UI 구조
+
+- Navigation 3의 직렬화 가능한 route 사용
+- 퀴즈 유형은 별도 route가 아니라 단일 `Study` 화면의 `phase`로 표현
+- 화면은 `UiState`를 표시하고 `UiEvent`만 전달
+- 내비게이션·TTS·키보드·자동 진행은 일회성 `UiEffect`
+- ViewModel은 Codex, Compose 표시 계층은 Claude 소유
+- 상세 계약은 `docs/UI_CONTRACT.md` 참조

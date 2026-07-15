@@ -1,5 +1,7 @@
 # LexiLoop UI 기획
 
+상세 route·와이어프레임·상태 계약은 `docs/UI_CONTRACT.md` 참조
+
 ## 방향
 
 모토: 깔끔함
