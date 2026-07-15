@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">LexiLoop</string>
+    <string name="notification_channel_name">학습 알림</string>
+    <string name="notification_title">오늘의 LexiLoop</string>
+    <string name="notification_body">짧게 학습하고 복습 흐름을 이어가세요</string>
 </resources>

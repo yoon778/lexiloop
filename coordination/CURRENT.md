@@ -2,11 +2,11 @@
 
 - 현재 단계: Android 구현
 - 현재 담당: Codex
-- 현재 작업: 알림 예약·재예약과 Android TextToSpeech
-- 마지막 완료: Gemini Interactions API v1 엄격 JSON 계약·최대 2회 교정
+- 현재 작업: 전체 검증과 Claude Compose UI 인수인계 준비
+- 마지막 완료: 알림·TTS·직렬화 route·ViewModel UI 계약
 - 수정 파일: `app/src/main`, `app/src/test`, coordination 문서
-- 검증: JVM 25개, Pixel 7 API 37 Room 통합 4개 통과
-- 다음 행동: 일일 알림 스케줄러와 TTS 수명주기 래퍼 구현
+- 검증: JVM 27개, assembleDebug·lintDebug 통과, Pixel 7 API 37 Room 통합 4개 통과
+- 다음 행동: 전체 테스트 재실행 후 Claude 요청·handoff 문서 작성
 - 브랜치: `main`
 - 원격: `origin` → `https://github.com/yoon778/lexiloop`
 - 보류: 별도 `english` 루트 폴더가 다른 프로세스에 점유됨
