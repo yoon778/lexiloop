@@ -27,9 +27,16 @@
 - [x] `completed` `.gitignore` 작성
 - [x] `completed` GitHub 원격 저장소 연결
 - [ ] `pending` 새 `lexiloop` 작업공간 재접속 후 기존 `english` 폴더 삭제
-- [ ] `pending` 기본 Android 프로젝트 생성
-- [ ] `pending` 빌드·테스트 명령 문서화
+- [x] `completed` 기본 Android 프로젝트 생성
+- [x] `completed` 빌드·테스트 명령 문서화
 
 ## 구현
 
-구현 작업은 상세 설계 후 작은 단위로 추가
+- [ ] `in_progress` 정답 정규화·학습·복습 순수 도메인 로직
+- [ ] `pending` Room 엔티티·DAO·트랜잭션 저장소
+- [ ] `pending` DataStore 설정 저장소
+- [ ] `pending` Gemini REST·JSON 검증
+- [ ] `pending` 알림 예약·재예약
+- [ ] `pending` Android TextToSpeech
+- [ ] `pending` ViewModel·UiState·UiEvent 계약 구현
+- [ ] `pending` 단위·통합 테스트

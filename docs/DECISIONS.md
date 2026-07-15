@@ -77,7 +77,7 @@
 - application ID는 `com.yoon778.lexiloop`
 - `minSdk 26`, `compileSdk 37`, `targetSdk 36`
 - AGP 9.2.1, Gradle 9.4.1, AGP 내장 Kotlin 2.3.10 사용
-- Gradle은 JDK 21로 실행하고 Java toolchain은 17로 고정
+- Gradle은 JDK 21로 실행하고 Java/Kotlin source·bytecode target은 17로 고정
 - 단일 `app` 모듈과 수동 생성자 주입 사용
 - Compose BOM 2026.06.00과 안정 AndroidX만 사용
 - Navigation 3, Room 2.8.4, Typed DataStore 1.2.1 사용

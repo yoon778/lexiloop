@@ -11,7 +11,7 @@
 - 알림: 부정확 알람, 설정 시각 근처 하루 1회
 - AI: Gemini API, 개인 베타에서만 앱 개발 설정을 통해 접근
 - SDK: `minSdk 26`, `compileSdk 37`, `targetSdk 36`
-- 빌드: AGP 9.2.1, Gradle 9.4.1, JDK 21, Java toolchain 17
+- 빌드: AGP 9.2.1, Gradle 9.4.1, JDK 21, Java/Kotlin target 17
 - 구조: 단일 `app` 모듈, 수동 생성자 주입
 
 세부 버전은 `docs/TECH_STACK.md` 참조

@@ -7,7 +7,8 @@
 ## 현재 상태
 
 - 기획 완료
-- 개발 미시작
+- Android 프로젝트 생성·첫 빌드 완료
+- Codex 담당 로직 구현 중
 - 1개월 개인 베타 후 Play Store 출시 검토
 
 ## 기술 방향
@@ -23,7 +24,11 @@
 
 - [제품 기획](docs/PRODUCT_SPEC.md)
 - [기술 아키텍처](docs/ARCHITECTURE.md)
+- [기술 스택](docs/TECH_STACK.md)
+- [개발 환경과 명령](docs/DEVELOPMENT.md)
+- [영한 데이터 출처](docs/DATA_SOURCES.md)
 - [UI 기획](docs/UI_SPEC.md)
+- [UI 계약과 와이어프레임](docs/UI_CONTRACT.md)
 - [확정 결정](docs/DECISIONS.md)
 - [에이전트 작업 규칙](AGENTS.md)
 - [현재 작업 상태](coordination/CURRENT.md)
