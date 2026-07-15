@@ -1,4 +1,4 @@
-# English
+# LexiLoop
 
 개인 관심사에 맞는 Android 영단어 학습 앱
 

@@ -1,4 +1,4 @@
-# UI 기획
+# LexiLoop UI 기획
 
 ## 방향
 

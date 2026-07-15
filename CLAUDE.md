@@ -1,6 +1,6 @@
 # Claude 작업 진입점
 
-이 프로젝트에서 Claude는 UI 담당
+LexiLoop 프로젝트에서 Claude는 UI 담당
 
 작업 전 반드시 읽기
 
