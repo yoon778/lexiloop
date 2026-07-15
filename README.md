@@ -35,7 +35,8 @@
 
 한 번에 한 에이전트만 `main`에서 작업하며 완료된 단위만 검증 후 커밋·푸시
 
-Claude 첫 작업에는 [초기 인식 프롬프트](CLAUDE_INITIAL_PROMPT.md) 사용
+- Codex 재접속에는 [Codex 초기 프롬프트](CODEX_INITIAL_PROMPT.md) 사용
+- Claude 첫 작업에는 [Claude 초기 프롬프트](CLAUDE_INITIAL_PROMPT.md) 사용
 
 ## 보안
 
