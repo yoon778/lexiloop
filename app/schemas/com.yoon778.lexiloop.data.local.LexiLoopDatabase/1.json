@@ -1,0 +1,601 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "f007fb575ba76ed3c9092b25ef9e09e7",
+    "entities": [
+      {
+        "tableName": "learning_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `contentKey` TEXT NOT NULL, `expression` TEXT NOT NULL, `normalizedExpression` TEXT NOT NULL, `baseForm` TEXT, `itemType` TEXT NOT NULL, `partOfSpeech` TEXT NOT NULL, `targetMeaningKo` TEXT NOT NULL, `phonetic` TEXT, `exampleSentence` TEXT NOT NULL, `exampleTranslationKo` TEXT NOT NULL, `exampleTargetForm` TEXT NOT NULL, `topic` TEXT NOT NULL, `difficulty` TEXT NOT NULL, `meaningSourceName` TEXT, `meaningSourceUrl` TEXT, `meaningLicenseName` TEXT, `meaningLicenseUrl` TEXT, `exampleSourceName` TEXT, `exampleSourceUrl` TEXT, `exampleLicenseName` TEXT, `exampleLicenseUrl` TEXT, `generationBatchId` TEXT, `createdAtMillis` INTEGER NOT NULL, `updatedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contentKey",
+            "columnName": "contentKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expression",
+            "columnName": "expression",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "normalizedExpression",
+            "columnName": "normalizedExpression",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "baseForm",
+            "columnName": "baseForm",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "itemType",
+            "columnName": "itemType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "partOfSpeech",
+            "columnName": "partOfSpeech",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetMeaningKo",
+            "columnName": "targetMeaningKo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phonetic",
+            "columnName": "phonetic",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "exampleSentence",
+            "columnName": "exampleSentence",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exampleTranslationKo",
+            "columnName": "exampleTranslationKo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "exampleTargetForm",
+            "columnName": "exampleTargetForm",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "topic",
+            "columnName": "topic",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "difficulty",
+            "columnName": "difficulty",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meaningSourceName",
+            "columnName": "meaningSourceName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "meaningSourceUrl",
+            "columnName": "meaningSourceUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "meaningLicenseName",
+            "columnName": "meaningLicenseName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "meaningLicenseUrl",
+            "columnName": "meaningLicenseUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "exampleSourceName",
+            "columnName": "exampleSourceName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "exampleSourceUrl",
+            "columnName": "exampleSourceUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "exampleLicenseName",
+            "columnName": "exampleLicenseName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "exampleLicenseUrl",
+            "columnName": "exampleLicenseUrl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "generationBatchId",
+            "columnName": "generationBatchId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAtMillis",
+            "columnName": "createdAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtMillis",
+            "columnName": "updatedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_learning_items_contentKey",
+            "unique": true,
+            "columnNames": [
+              "contentKey"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_learning_items_contentKey` ON `${TABLE_NAME}` (`contentKey`)"
+          },
+          {
+            "name": "index_learning_items_normalizedExpression",
+            "unique": false,
+            "columnNames": [
+              "normalizedExpression"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_learning_items_normalizedExpression` ON `${TABLE_NAME}` (`normalizedExpression`)"
+          },
+          {
+            "name": "index_learning_items_topic_difficulty",
+            "unique": false,
+            "columnNames": [
+              "topic",
+              "difficulty"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_learning_items_topic_difficulty` ON `${TABLE_NAME}` (`topic`, `difficulty`)"
+          }
+        ]
+      },
+      {
+        "tableName": "auxiliary_meanings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `sortOrder` INTEGER NOT NULL, `meaningKo` TEXT NOT NULL, PRIMARY KEY(`itemId`, `sortOrder`), FOREIGN KEY(`itemId`) REFERENCES `learning_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meaningKo",
+            "columnName": "meaningKo",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "itemId",
+            "sortOrder"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "learning_items",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "itemId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "learning_progress",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `status` TEXT NOT NULL, `queueOrder` INTEGER, `intervalIndex` INTEGER, `dueEpochDay` INTEGER, `learnedEpochDay` INTEGER, `masteredEpochDay` INTEGER, `excludedAtMillis` INTEGER, `updatedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`itemId`), FOREIGN KEY(`itemId`) REFERENCES `learning_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queueOrder",
+            "columnName": "queueOrder",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "intervalIndex",
+            "columnName": "intervalIndex",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dueEpochDay",
+            "columnName": "dueEpochDay",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "learnedEpochDay",
+            "columnName": "learnedEpochDay",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "masteredEpochDay",
+            "columnName": "masteredEpochDay",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "excludedAtMillis",
+            "columnName": "excludedAtMillis",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "updatedAtMillis",
+            "columnName": "updatedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "itemId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_learning_progress_status_excludedAtMillis_queueOrder",
+            "unique": false,
+            "columnNames": [
+              "status",
+              "excludedAtMillis",
+              "queueOrder"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_learning_progress_status_excludedAtMillis_queueOrder` ON `${TABLE_NAME}` (`status`, `excludedAtMillis`, `queueOrder`)"
+          },
+          {
+            "name": "index_learning_progress_status_excludedAtMillis_dueEpochDay_itemId",
+            "unique": false,
+            "columnNames": [
+              "status",
+              "excludedAtMillis",
+              "dueEpochDay",
+              "itemId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_learning_progress_status_excludedAtMillis_dueEpochDay_itemId` ON `${TABLE_NAME}` (`status`, `excludedAtMillis`, `dueEpochDay`, `itemId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "learning_items",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "itemId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "study_sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `epochDay` INTEGER NOT NULL, `type` TEXT NOT NULL, `status` TEXT NOT NULL, `goalCount` INTEGER NOT NULL, `startedAtMillis` INTEGER NOT NULL, `completedAtMillis` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "epochDay",
+            "columnName": "epochDay",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "goalCount",
+            "columnName": "goalCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startedAtMillis",
+            "columnName": "startedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completedAtMillis",
+            "columnName": "completedAtMillis",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_study_sessions_epochDay_type",
+            "unique": true,
+            "columnNames": [
+              "epochDay",
+              "type"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_study_sessions_epochDay_type` ON `${TABLE_NAME}` (`epochDay`, `type`)"
+          }
+        ]
+      },
+      {
+        "tableName": "session_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sessionId` TEXT NOT NULL, `itemId` TEXT NOT NULL, `queueOrder` INTEGER NOT NULL, `state` TEXT NOT NULL, `phase` TEXT NOT NULL, `retryPhase` TEXT, `knownPath` INTEGER NOT NULL, `phaseFailureCount` INTEGER NOT NULL, `hadInitialReviewError` INTEGER NOT NULL, `reviewIntervalAtStart` INTEGER, `lastSubmittedAnswer` TEXT, `updatedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`sessionId`, `itemId`), FOREIGN KEY(`sessionId`) REFERENCES `study_sessions`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`itemId`) REFERENCES `learning_items`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queueOrder",
+            "columnName": "queueOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phase",
+            "columnName": "phase",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retryPhase",
+            "columnName": "retryPhase",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "knownPath",
+            "columnName": "knownPath",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phaseFailureCount",
+            "columnName": "phaseFailureCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hadInitialReviewError",
+            "columnName": "hadInitialReviewError",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reviewIntervalAtStart",
+            "columnName": "reviewIntervalAtStart",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "lastSubmittedAnswer",
+            "columnName": "lastSubmittedAnswer",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "updatedAtMillis",
+            "columnName": "updatedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sessionId",
+            "itemId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_session_items_itemId",
+            "unique": false,
+            "columnNames": [
+              "itemId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_session_items_itemId` ON `${TABLE_NAME}` (`itemId`)"
+          },
+          {
+            "name": "index_session_items_sessionId_state_queueOrder",
+            "unique": false,
+            "columnNames": [
+              "sessionId",
+              "state",
+              "queueOrder"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_session_items_sessionId_state_queueOrder` ON `${TABLE_NAME}` (`sessionId`, `state`, `queueOrder`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "study_sessions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "learning_items",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "itemId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "error_notes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `itemId` TEXT NOT NULL, `category` TEXT NOT NULL, `note` TEXT NOT NULL, `createdAtMillis` INTEGER NOT NULL, `resolvedAtMillis` INTEGER, PRIMARY KEY(`id`), FOREIGN KEY(`itemId`) REFERENCES `learning_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtMillis",
+            "columnName": "createdAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resolvedAtMillis",
+            "columnName": "resolvedAtMillis",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_error_notes_itemId_createdAtMillis",
+            "unique": false,
+            "columnNames": [
+              "itemId",
+              "createdAtMillis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_error_notes_itemId_createdAtMillis` ON `${TABLE_NAME}` (`itemId`, `createdAtMillis`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "learning_items",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "itemId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f007fb575ba76ed3c9092b25ef9e09e7')"
+    ]
+  }
+}

@@ -62,3 +62,8 @@ PowerShell, 저장소 루트 기준
 - `assembleDebug`: 성공
 - `test`: 성공, 테스트 소스 추가 전이라 `NO-SOURCE`
 - Gradle configuration cache: 성공
+
+2026-07-15 Room 구현 후
+
+- JVM 도메인 테스트 17개: 성공
+- Pixel 7 API 37 Room 통합 테스트 4개: 성공
