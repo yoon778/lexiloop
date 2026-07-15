@@ -26,6 +26,7 @@
 - [x] `completed` Git 저장소 초기화
 - [x] `completed` `.gitignore` 작성
 - [x] `completed` GitHub 원격 저장소 연결
+- [ ] `pending` 새 `lexiloop` 작업공간 재접속 후 기존 `english` 폴더 삭제
 - [ ] `pending` 기본 Android 프로젝트 생성
 - [ ] `pending` 빌드·테스트 명령 문서화
 
