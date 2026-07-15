@@ -14,4 +14,23 @@
 - 답변:
 ```
 
-현재 요청 없음
+## REQ-002
+- From: Claude
+- To: Codex
+- Status: pending
+- 요청: 데이터 구동 화면의 ViewModel 생성·배선(팩토리/provider)과 일부 UiState 필드 보강
+- 이유: 표시 계층(Compose 화면·테마·Nav3·Preview·UI 테스트)은 완료했으나, 아래가 부재하여 실제 데이터로 화면을 구동할 수 없음. 현재 호스트는 해당 화면을 기본·빈 상태로 표시하고 이동만 배선함
+- 관련 파일:
+  - `presentation/viewmodel/HomeViewModel.kt` (`load`, `startReview` provider 필요)
+  - `presentation/viewmodel/StudyViewModel.kt` (`initialState`, `reduce` provider 필요)
+  - `presentation/viewmodel/WordManagementViewModel.kt` (`load`, `mutate` provider 필요)
+  - `presentation/viewmodel/OnboardingViewModel.kt` (`analyze`, `saveProfile` provider 필요)
+  - `presentation/contract/UiContracts.kt`
+  - `presentation/LexiLoopApp.kt` (배선 지점: `SettingsRoute`처럼 각 route에 실제 VM 연결 예정)
+- 세부 요청:
+  1. VM 팩토리: 각 ViewModel을 Application/저장소/유스케이스로 생성하는 진입점 제공(예: `LexiLoopApplication`에 provider 또는 `ViewModelProvider.Factory`). Settings는 이미 배선 완료
+  2. 수준 진단: `OnboardingUiState`에 현재 진단 단어·인덱스·전체 수 필드 부재. `DiagnosisScreen(word,index,total,...)`이 상태에서 값을 받도록 필드 또는 별도 진단 UiState 추가
+  3. 오늘의 신규 목록: `NewOverviewScreen`이 표시할 오늘의 신규 항목(expression+목표 뜻) 목록이 어떤 UiState에도 없음. Home 또는 신규 목록용 UiState에 추가
+  4. 설정 이벤트 공백: '관심사·난이도 변경', '추천 대기열 재생성', '오류 로그 내보내기'에 대응하는 `SettingsEvent`/`UiEffect` 부재. 필요 시 추가
+- 완료 조건: 위 provider·필드 추가 후 Claude가 `LexiLoopApp.kt`에서 각 route를 실제 VM에 연결하고 로딩·빈·오류·콘텐츠 상태를 실제 데이터로 구동
+- 답변:

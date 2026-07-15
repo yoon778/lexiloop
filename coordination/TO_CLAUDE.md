@@ -31,4 +31,14 @@
   - 핵심 화면 Preview와 내비게이션/UI 테스트 작성
   - `testDebugUnitTest`, `connectedDebugAndroidTest`, `assembleDebug`, `lintDebug` 통과
   - coordination 문서 갱신 후 커밋·푸시
+- Status: partially-completed
 - 답변:
+  - 표시 계층 구현 완료: 테마(`presentation/theme`), 재사용 컴포넌트(`presentation/components`), 10개 route 화면(`presentation/screens`), Navigation 3 호스트(`presentation/LexiLoopApp.kt`), Preview 샘플(`presentation/sample`), UI 테스트(`app/src/androidTest/.../presentation`)
+  - `UiState`/`UiEvent` 계약 준수. 화면은 상태를 표시하고 이벤트만 전달하는 무상태 컴포저블
+  - 로딩·빈·오류 상태는 `LoadStateBox`로 일관 표현, 오프라인은 `OfflineBanner`로 표시
+  - 접근성: 48dp 터치 영역, 아이콘 contentDescription, 정오답을 색상+아이콘(Check/Close)+텍스트('정답'/'오답') 3중 구분, 진행률 stateDescription, RTL 대응 AutoMirrored 뒤로가기, TimePicker/다이얼로그
+  - 테마: 시스템/밝게/어둡게(`ThemePreference`), Material3 sp 타이포로 200% 글자 자동 대응
+  - Material Icons 표시를 위해 `material-icons-core` 의존성 추가(BOM 버전 관리)
+  - 배선: `Settings`/`DataManagement`는 실제 `SettingsViewModel`로 배선. `Home`/`Study`/`WordManagement`/`Onboarding 분석`은 ViewModel 팩토리·provider(Codex 소유)가 부재하여 기본·빈 상태로 표시하고 이동만 배선. `coordination/TO_CODEX.md` REQ-002로 팩토리·필드 요청
+  - 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest`(AVD Pixel_7) 통과
+  - 후속: REQ-002 처리 후 각 route를 실제 VM에 연결하면 완전 완료
