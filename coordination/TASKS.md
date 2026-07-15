@@ -16,7 +16,7 @@
 - [ ] `pending` 최소 Android SDK와 의존성 버전 결정
 - [ ] `pending` 화면별 와이어프레임
 - [ ] `pending` Room 데이터 모델 상세 설계
-- [ ] `pending` 학습·복습 상태 전이표 작성
+- [x] `completed` 학습·복습 상태 전이표 작성
 - [ ] `pending` Gemini 요청·응답 JSON 스키마 작성
 - [ ] `pending` 개인 베타 체크리스트 작성
 - [ ] `pending` Play Store 출시 전 체크리스트 작성
