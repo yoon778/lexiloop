@@ -113,8 +113,8 @@ fun OnboardingAnalysisScreen(
     onBack: () -> Unit,
     onRetry: () -> Unit,
     onUseStarter: () -> Unit,
-    isGenerating: Boolean = false,
     modifier: Modifier = Modifier,
+    isGenerating: Boolean = false,
 ) {
     ScreenScaffold(title = "분석 결과", modifier = modifier, onBack = onBack) { padding ->
         LoadStateBox(

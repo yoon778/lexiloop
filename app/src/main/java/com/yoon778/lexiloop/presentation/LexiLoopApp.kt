@@ -1,5 +1,9 @@
 package com.yoon778.lexiloop.presentation
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -100,6 +104,18 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
         onDispose { tts.close() }
     }
 
+    // Android 13+ 알림 런타임 권한. 거부돼도 앱 동작에는 지장 없음(알림만 표시 안 됨).
+    val notificationPermission = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (!granted) toast("알림 권한이 없어 학습 알림이 표시되지 않아요")
+    }
+    fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     val nav = remember {
         object {
             fun go(route: AppRoute, clear: Boolean = false) {
@@ -117,7 +133,7 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
                     is UiEffect.Speak -> if (!tts.speak(effect.text)) toast("발음을 재생할 수 없어요")
                     UiEffect.LaunchJsonExport, UiEffect.LaunchJsonImport ->
                         toast("데이터 내보내기·가져오기는 준비 중이에요")
-                    UiEffect.RequestNotificationPermission -> Unit
+                    UiEffect.RequestNotificationPermission -> requestNotificationPermission()
                     else -> Unit
                 }
             }
