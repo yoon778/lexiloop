@@ -1,8 +1,10 @@
 package com.yoon778.lexiloop.presentation
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -58,6 +60,31 @@ class ScreensUiTest {
     fun homeSettingsIcon_hasContentDescription() {
         rule.setContent { LexiLoopTheme { HomeScreen(Samples.home, {}) } }
         rule.onNodeWithContentDescription("설정").assertIsDisplayed()
+    }
+
+    @Test
+    fun spellingPhase_doesNotRevealExpression() {
+        rule.setContent { LexiLoopTheme { StudyScreen(Samples.study(LearningPhase.SPELLING), {}, {}) } }
+        // 정답인 영어 표현·발음·듣기가 화면에 없어야 함.
+        rule.onAllNodesWithText("deploy").assertCountEquals(0)
+        rule.onAllNodesWithText("다시 듣기").assertCountEquals(0)
+        // 뜻 프롬프트는 표시.
+        rule.onNodeWithText("배포하다").assertIsDisplayed()
+    }
+
+    @Test
+    fun koToEnChoicePhase_doesNotRevealExpressionOutsideChoices() {
+        rule.setContent { LexiLoopTheme { StudyScreen(Samples.study(LearningPhase.KO_TO_EN), {}, {}) } }
+        // 선택지 안의 1개만 존재해야 함(상단 헤더 노출 없음).
+        rule.onAllNodesWithText("deploy").assertCountEquals(1)
+        rule.onAllNodesWithText("다시 듣기").assertCountEquals(0)
+    }
+
+    @Test
+    fun cardPhase_showsExpressionAndListen() {
+        rule.setContent { LexiLoopTheme { StudyScreen(Samples.study(LearningPhase.CARD), {}, {}) } }
+        rule.onNodeWithText("deploy").assertIsDisplayed()
+        rule.onNodeWithText("다시 듣기").assertIsDisplayed()
     }
 
     @Test

@@ -1,11 +1,11 @@
 # 현재 상태
 
-- 현재 단계: Claude UI 모션 2차(전환 애니메이션·정답 피드백 팝+haptic·다크 확인) 완료
+- 현재 단계: Claude Study 정답 노출 버그 수정 완료
 - 현재 담당: 없음
 - 현재 작업: 없음
-- 마지막 완료: NavDisplay slide+fade 전환(260ms), FeedbackBanner 등장 spring 팝 + Confirm/Reject haptic, 다크 모드 홈 렌더 확인
-- 기준 커밋: `3b46964`
-- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest` AVD Pixel_7 15개 통과(0 실패). 에뮬레이터 라이트·다크 홈 렌더 확인
+- 마지막 완료: 한→영 객관식·철자·문장 단계에서 상단 영어 표현·발음·듣기 숨김(정답 노출 방지), 회귀 UI 테스트 3개 추가
+- 기준 커밋: `7c46cd6`
+- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest` AVD Pixel_7 18개 통과(0 실패)
 - 수정 파일: `presentation/theme`, `presentation/components`, `presentation/screens`, `presentation/sample`, `app/src/main/res/font/*`, `app/src/androidTest`, coordination 문서
 - 미완료 부분: 복합 표현 정확 판별 플래그(`TO_CODEX.md` REQ-005 pending) — 현재는 표현 공백 휴리스틱 사용
 - 다음 행동: Codex가 REQ-005 처리 시 휴리스틱을 실제 `ItemType` 플래그로 교체

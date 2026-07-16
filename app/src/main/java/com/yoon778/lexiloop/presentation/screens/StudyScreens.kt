@@ -73,19 +73,25 @@ fun StudyScreen(
         ) {
             StudyProgressBar(state.completedCount, state.totalCount)
 
-            // 표현 + 발음
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                if (isCompoundExpression(state.expression)) AuxiliaryBadge()
-                Text(state.expression, style = MaterialTheme.typography.displaySmall)
-                state.phonetic?.let {
-                    Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                TextButton(onClick = { onEvent(StudyEvent.RepeatPronunciation) }) {
-                    Text("다시 듣기")
+            // 영어 표현이 정답인 단계(한→영 객관식, 철자, 문장 빈칸)에서는
+            // 표현·발음·듣기를 숨긴다. 노출하면 회상 검증이 무의미해짐.
+            val answerIsExpression = state.phase == LearningPhase.KO_TO_EN ||
+                state.phase == LearningPhase.SPELLING ||
+                state.phase == LearningPhase.SENTENCE
+            if (!answerIsExpression) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    if (isCompoundExpression(state.expression)) AuxiliaryBadge()
+                    Text(state.expression, style = MaterialTheme.typography.displaySmall)
+                    state.phonetic?.let {
+                        Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    TextButton(onClick = { onEvent(StudyEvent.RepeatPronunciation) }) {
+                        Text("다시 듣기")
+                    }
                 }
             }
 
@@ -108,8 +114,15 @@ private fun PhaseContent(state: StudyUiState, onEvent: (StudyEvent) -> Unit) {
             }
         }
         LearningPhase.EN_TO_KO, LearningPhase.KO_TO_EN -> {
-            val prompt = if (state.phase == LearningPhase.KO_TO_EN) state.targetMeaningKo else state.expression
-            Text(prompt, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            // 영→한은 상단 헤더가 이미 표현을 보여주므로 한→영일 때만 뜻 프롬프트 표시.
+            if (state.phase == LearningPhase.KO_TO_EN) {
+                Text(
+                    state.targetMeaningKo,
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
                 state.phaseContent.forEachIndexed { i, choice ->
                     ChoiceButton(choice, onClick = { onEvent(StudyEvent.ChoiceSelected(i)) })
@@ -121,7 +134,12 @@ private fun PhaseContent(state: StudyUiState, onEvent: (StudyEvent) -> Unit) {
                 Text(state.phaseContent.firstOrNull() ?: state.exampleSentence, style = MaterialTheme.typography.titleMedium)
                 Text(state.exampleTranslationKo, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
-                Text(state.targetMeaningKo, style = MaterialTheme.typography.titleLarge)
+                Text(
+                    state.targetMeaningKo,
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
             AnswerInput(state, onEvent)
             state.hint?.let {
