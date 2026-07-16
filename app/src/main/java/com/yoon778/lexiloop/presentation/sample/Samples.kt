@@ -55,7 +55,7 @@ object Samples {
         "deploy" to "배포하다",
         "grocery" to "식료품",
         "maintain" to "유지하다",
-        "refactor" to "리팩터링하다",
+        "give up" to "포기하다",
         "commute" to "통근하다",
     )
 

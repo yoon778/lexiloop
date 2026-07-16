@@ -43,4 +43,6 @@
 - [x] `completed` 실제 Gemini 목적 분석·추천 300개 생성 확인
 - [x] `completed` 핵심 단어 80%·보조 표현 20% 생성 계약과 신규 세션 우선순위
 - [x] `completed` 실제 Gemini 300개 핵심 단어 240·보조 표현 60과 분야 150:150 검증
-- [ ] `pending` Claude 보조 표현 배지·구분 UI
+- [x] `completed` Claude 보조 표현 배지·구분 UI
+- [x] `completed` 애플·토스풍 UI 리디자인 (Pretendard·Shapes·카드·모션)
+- [ ] `pending` 복합 표현 정확 판별 플래그 (REQ-005, Codex)

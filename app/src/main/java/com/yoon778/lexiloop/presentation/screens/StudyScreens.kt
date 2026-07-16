@@ -33,8 +33,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yoon778.lexiloop.domain.model.LearningPhase
+import com.yoon778.lexiloop.presentation.components.AuxiliaryBadge
 import com.yoon778.lexiloop.presentation.components.ChoiceButton
 import com.yoon778.lexiloop.presentation.components.FeedbackBanner
+import com.yoon778.lexiloop.presentation.components.isCompoundExpression
 import com.yoon778.lexiloop.presentation.components.PrimaryButton
 import com.yoon778.lexiloop.presentation.components.ScreenScaffold
 import com.yoon778.lexiloop.presentation.components.StudyProgressBar
@@ -75,8 +77,9 @@ fun StudyScreen(
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
+                if (isCompoundExpression(state.expression)) AuxiliaryBadge()
                 Text(state.expression, style = MaterialTheme.typography.displaySmall)
                 state.phonetic?.let {
                     Text(it, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -241,6 +244,20 @@ private fun StudySpellingPreview() = LexiLoopTheme {
 private fun StudyCorrectionPreview() = LexiLoopTheme {
     StudyScreen(
         Samples.study(LearningPhase.CORRECTION, StudyFeedback(false, "정답은 deploy")),
+        {},
+        {},
+    )
+}
+
+@Preview
+@Composable
+private fun StudyCompoundPreview() = LexiLoopTheme {
+    StudyScreen(
+        Samples.study(LearningPhase.CARD).copy(
+            expression = "give up",
+            phonetic = "/ɡɪv ʌp/",
+            targetMeaningKo = "포기하다",
+        ),
         {},
         {},
     )

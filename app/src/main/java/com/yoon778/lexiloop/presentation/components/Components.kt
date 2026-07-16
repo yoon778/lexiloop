@@ -1,6 +1,10 @@
 package com.yoon778.lexiloop.presentation.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,12 +30,18 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -42,6 +53,10 @@ import com.yoon778.lexiloop.presentation.contract.LoadState
 import com.yoon778.lexiloop.presentation.contract.StudyFeedback
 
 private val MinTouch = 48.dp
+
+/** 표현이 두 단어 이상이면 복합(보조) 표현으로 간주. 표시용 휴리스틱. */
+fun isCompoundExpression(expression: String): Boolean =
+    expression.trim().any { it.isWhitespace() }
 
 /** 상단바(뒤로가기 48dp)와 표준 배경을 가진 화면 골격. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +74,11 @@ fun ScreenScaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(title) },
+                title = { Text(title, style = MaterialTheme.typography.titleLarge) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background,
+                ),
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack, modifier = Modifier.size(MinTouch)) {
@@ -73,6 +92,22 @@ fun ScreenScaffold(
         bottomBar = bottomBar,
         content = content,
     )
+}
+
+/** 흰 표면 + hairline 테두리 + 라운드 카드. 애플·토스풍 그룹 컨테이너. */
+@Composable
+fun AppCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+    ) {
+        Box(Modifier.padding(20.dp)) { content() }
+    }
 }
 
 /** 비동기 화면의 로딩·빈·오류·콘텐츠 상태를 일관되게 표시. */
@@ -90,15 +125,11 @@ fun <T> LoadStateBox(
                 modifier = Modifier.semantics { contentDescription = "불러오는 중" },
             )
             is LoadState.Content -> content(state.value)
-            is LoadState.Empty -> CenteredMessage(
-                message = state.message,
-                actionLabel = state.actionLabel,
-                onAction = onAction,
-            )
+            is LoadState.Empty -> CenteredMessage(state.message, state.actionLabel, onAction)
             is LoadState.Error -> CenteredMessage(
-                message = state.message,
-                actionLabel = if (state.canRetry) "다시 시도" else null,
-                onAction = onRetry,
+                state.message,
+                if (state.canRetry) "다시 시도" else null,
+                onRetry,
             )
         }
     }
@@ -111,11 +142,7 @@ private fun CenteredMessage(message: String, actionLabel: String?, onAction: () 
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-        )
+        Text(message, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
         if (actionLabel != null) {
             OutlinedButton(onClick = onAction, modifier = Modifier.heightIn(min = MinTouch)) {
                 Text(actionLabel)
@@ -130,19 +157,35 @@ fun OfflineBanner(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(MaterialTheme.shapes.small)
             .background(MaterialTheme.colorScheme.secondaryContainer)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "오프라인 상태예요. 학습은 계속할 수 있어요",
+            "오프라인 상태예요. 학습은 계속할 수 있어요",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
         )
     }
 }
 
-/** 주 행동 버튼. 처리 중에는 자기 자신만 비활성화. */
+/** 복합(보조) 표현 배지. 색상 + '보조 표현' 텍스트로 핵심 단어와 구분. */
+@Composable
+fun AuxiliaryBadge(modifier: Modifier = Modifier) {
+    Text(
+        text = "보조 표현",
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+            .semantics { contentDescription = "보조 표현" },
+    )
+}
+
+/** 주 행동 버튼. 눌림 시 미세 축소(손맛), 처리 중에는 자기 자신만 비활성화. */
 @Composable
 fun PrimaryButton(
     text: String,
@@ -151,10 +194,18 @@ fun PrimaryButton(
     enabled: Boolean = true,
     loading: Boolean = false,
 ) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (pressed) 0.97f else 1f, label = "press")
     Button(
         onClick = onClick,
         enabled = enabled && !loading,
-        modifier = modifier.heightIn(min = MinTouch),
+        interactionSource = interaction,
+        shape = MaterialTheme.shapes.small,
+        contentPadding = PaddingValues(vertical = 14.dp, horizontal = 24.dp),
+        modifier = modifier
+            .heightIn(min = MinTouch)
+            .graphicsLayer { scaleX = scale; scaleY = scale },
     ) {
         if (loading) {
             CircularProgressIndicator(
@@ -165,12 +216,12 @@ fun PrimaryButton(
                 color = MaterialTheme.colorScheme.onPrimary,
             )
         } else {
-            Text(text)
+            Text(text, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
 
-/** 객관식 등 선택지 버튼. 전체 너비, 최소 48dp. */
+/** 객관식 등 선택지 버튼. 전체 너비, 최소 48dp, hairline 라운드. */
 @Composable
 fun ChoiceButton(
     text: String,
@@ -178,15 +229,23 @@ fun ChoiceButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val scale by animateFloatAsState(if (pressed) 0.98f else 1f, label = "press")
     OutlinedButton(
         onClick = onClick,
         enabled = enabled,
-        shape = RoundedCornerShape(12.dp),
+        interactionSource = interaction,
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = MaterialTheme.colorScheme.surface),
+        contentPadding = PaddingValues(vertical = 14.dp, horizontal = 20.dp),
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = MinTouch),
+            .heightIn(min = MinTouch)
+            .graphicsLayer { scaleX = scale; scaleY = scale },
     ) {
-        Text(text, style = MaterialTheme.typography.bodyLarge)
+        Text(text, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -196,8 +255,10 @@ fun StudyProgressBar(completed: Int, total: Int, modifier: Modifier = Modifier) 
     val fraction = if (total > 0) completed.toFloat() / total else 0f
     LinearProgressIndicator(
         progress = { fraction },
+        strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
         modifier = modifier
             .fillMaxWidth()
+            .heightIn(min = 6.dp)
             .semantics { stateDescription = "전체 $total 중 $completed 완료" },
     )
 }
@@ -220,34 +281,33 @@ fun FeedbackBanner(feedback: StudyFeedback, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(container, RoundedCornerShape(12.dp))
+            .clip(MaterialTheme.shapes.medium)
+            .background(container)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Icon(icon, contentDescription = null, tint = onContainer)
         Text(
-            text = "$label · ${feedback.message}",
+            "$label · ${feedback.message}",
             color = onContainer,
             style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
 
+/** 큰 숫자를 강조하는 통계 카드. 토스풍 시그니처. */
 @Composable
 fun StatChip(label: String, value: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .clearAndSetSemantics { contentDescription = "$label $value" },
-    ) {
-        Text(value, style = MaterialTheme.typography.titleLarge)
-        Text(
-            label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+    AppCard(modifier = modifier.clearAndSetSemantics { contentDescription = "$label $value" }) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(value, style = MaterialTheme.typography.displaySmall)
+            Text(
+                label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -270,15 +330,8 @@ fun DialogButtons(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
-    ) {
-        TextButton(onClick = onDismiss, modifier = Modifier.heightIn(min = MinTouch)) {
-            Text("취소")
-        }
-        TextButton(onClick = onConfirm, modifier = Modifier.heightIn(min = MinTouch)) {
-            Text(confirmLabel)
-        }
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        TextButton(onClick = onDismiss, modifier = Modifier.heightIn(min = MinTouch)) { Text("취소") }
+        TextButton(onClick = onConfirm, modifier = Modifier.heightIn(min = MinTouch)) { Text(confirmLabel) }
     }
 }

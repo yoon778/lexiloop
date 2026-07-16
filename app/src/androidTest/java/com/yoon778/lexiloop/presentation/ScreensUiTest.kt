@@ -12,6 +12,7 @@ import com.yoon778.lexiloop.presentation.contract.StudyFeedback
 import com.yoon778.lexiloop.presentation.contract.WordManagementUiState
 import com.yoon778.lexiloop.presentation.sample.Samples
 import com.yoon778.lexiloop.presentation.screens.HomeScreen
+import com.yoon778.lexiloop.presentation.screens.NewOverviewScreen
 import com.yoon778.lexiloop.presentation.screens.SettingsScreen
 import com.yoon778.lexiloop.presentation.screens.StudyScreen
 import com.yoon778.lexiloop.presentation.screens.WordManagementScreen
@@ -57,6 +58,20 @@ class ScreensUiTest {
     fun homeSettingsIcon_hasContentDescription() {
         rule.setContent { LexiLoopTheme { HomeScreen(Samples.home, {}) } }
         rule.onNodeWithContentDescription("설정").assertIsDisplayed()
+    }
+
+    @Test
+    fun newOverview_compoundExpression_showsAuxiliaryBadge() {
+        rule.setContent {
+            LexiLoopTheme {
+                NewOverviewScreen(
+                    words = listOf("give up" to "포기하다", "deploy" to "배포하다"),
+                    onStart = {},
+                    onBack = {},
+                )
+            }
+        }
+        rule.onNodeWithText("보조 표현").assertIsDisplayed()
     }
 
     @Test

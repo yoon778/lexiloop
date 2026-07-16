@@ -23,8 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.yoon778.lexiloop.presentation.components.AuxiliaryBadge
 import com.yoon778.lexiloop.presentation.components.ChoiceButton
 import com.yoon778.lexiloop.presentation.components.OfflineBanner
+import com.yoon778.lexiloop.presentation.components.isCompoundExpression
 import com.yoon778.lexiloop.presentation.components.PrimaryButton
 import com.yoon778.lexiloop.presentation.components.ScreenScaffold
 import com.yoon778.lexiloop.presentation.components.StatChip
@@ -142,9 +144,17 @@ fun NewOverviewScreen(
             items(words) { (expr, meaning) ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(expr, style = MaterialTheme.typography.bodyLarge)
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(expr, style = MaterialTheme.typography.bodyLarge)
+                        if (isCompoundExpression(expr)) AuxiliaryBadge()
+                    }
                     Text(meaning, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
