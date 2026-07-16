@@ -1,5 +1,11 @@
 package com.yoon778.lexiloop.presentation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -130,6 +136,15 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
             backStack = backStack,
             modifier = Modifier.padding(padding),
             onBack = { nav.back() },
+            // 절제된 slide+fade. 과한 전환 애니메이션 금지 원칙 준수.
+            transitionSpec = {
+                (slideInHorizontally(tween(260)) { it / 8 } + fadeIn(tween(260))) togetherWith
+                    (slideOutHorizontally(tween(260)) { -it / 12 } + fadeOut(tween(200)))
+            },
+            popTransitionSpec = {
+                (slideInHorizontally(tween(260)) { -it / 8 } + fadeIn(tween(260))) togetherWith
+                    (slideOutHorizontally(tween(260)) { it / 12 } + fadeOut(tween(200)))
+            },
             entryProvider = entryProvider {
                 entry<AppRoute.OnboardingPurpose> {
                     OnboardingPurposeScreen(

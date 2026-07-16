@@ -1,11 +1,11 @@
 # 현재 상태
 
-- 현재 단계: Claude 보조 표현 배지(REQ-004) + 애플·토스풍 UI 리디자인 완료
+- 현재 단계: Claude UI 모션 2차(전환 애니메이션·정답 피드백 팝+haptic·다크 확인) 완료
 - 현재 담당: 없음
 - 현재 작업: 없음
-- 마지막 완료: Pretendard 폰트, Shapes 토큰(14/20/28dp), 카드형 홈, press 모션, 보조 표현 배지(공백 휴리스틱) 적용·검증
-- 기준 커밋: `6308c13`
-- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest` AVD Pixel_7 15개 통과(0 실패). 에뮬레이터 설치·온보딩·홈 렌더 확인
+- 마지막 완료: NavDisplay slide+fade 전환(260ms), FeedbackBanner 등장 spring 팝 + Confirm/Reject haptic, 다크 모드 홈 렌더 확인
+- 기준 커밋: `3b46964`
+- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest` AVD Pixel_7 15개 통과(0 실패). 에뮬레이터 라이트·다크 홈 렌더 확인
 - 수정 파일: `presentation/theme`, `presentation/components`, `presentation/screens`, `presentation/sample`, `app/src/main/res/font/*`, `app/src/androidTest`, coordination 문서
 - 미완료 부분: 복합 표현 정확 판별 플래그(`TO_CODEX.md` REQ-005 pending) — 현재는 표현 공백 휴리스틱 사용
 - 다음 행동: Codex가 REQ-005 처리 시 휴리스틱을 실제 `ItemType` 플래그로 교체

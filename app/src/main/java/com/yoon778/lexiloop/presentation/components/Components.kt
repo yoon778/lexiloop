@@ -1,6 +1,9 @@
 package com.yoon778.lexiloop.presentation.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -36,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,6 +47,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -263,9 +269,19 @@ fun StudyProgressBar(completed: Int, total: Int, modifier: Modifier = Modifier) 
     )
 }
 
-/** 정답·오답 피드백. 색상·아이콘·텍스트 3중으로 구분. */
+/** 정답·오답 피드백. 색상·아이콘·텍스트 3중 구분 + 등장 팝 모션 + haptic. */
 @Composable
 fun FeedbackBanner(feedback: StudyFeedback, modifier: Modifier = Modifier) {
+    val haptic = LocalHapticFeedback.current
+    LaunchedEffect(feedback) {
+        haptic.performHapticFeedback(
+            if (feedback.correct) HapticFeedbackType.Confirm else HapticFeedbackType.Reject,
+        )
+    }
+    val appear = remember(feedback) { Animatable(0.92f) }
+    LaunchedEffect(feedback) {
+        appear.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+    }
     val container = if (feedback.correct) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
@@ -281,6 +297,11 @@ fun FeedbackBanner(feedback: StudyFeedback, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .graphicsLayer {
+                scaleX = appear.value
+                scaleY = appear.value
+                alpha = (appear.value - 0.9f).coerceIn(0f, 0.1f) * 10f
+            }
             .clip(MaterialTheme.shapes.medium)
             .background(container)
             .padding(16.dp),
