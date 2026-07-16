@@ -88,11 +88,38 @@ interface LexiLoopDao {
         JOIN learning_progress ON learning_progress.itemId = learning_items.id
         WHERE learning_progress.status = 'QUEUED'
           AND learning_progress.excludedAtMillis IS NULL
-        ORDER BY learning_progress.queueOrder, learning_items.id
+        ORDER BY CASE WHEN instr(trim(learning_items.expression), ' ') = 0 THEN 0 ELSE 1 END,
+                 learning_progress.queueOrder, learning_items.id
         LIMIT :limit
         """,
     )
     suspend fun queuedItems(limit: Int): List<LearningItemEntity>
+
+    @Query(
+        """
+        SELECT learning_items.* FROM learning_items
+        JOIN learning_progress ON learning_progress.itemId = learning_items.id
+        WHERE learning_progress.status = 'QUEUED'
+          AND learning_progress.excludedAtMillis IS NULL
+          AND instr(trim(learning_items.expression), ' ') = 0
+        ORDER BY learning_progress.queueOrder, learning_items.id
+        LIMIT :limit
+        """,
+    )
+    suspend fun queuedCoreItems(limit: Int): List<LearningItemEntity>
+
+    @Query(
+        """
+        SELECT learning_items.* FROM learning_items
+        JOIN learning_progress ON learning_progress.itemId = learning_items.id
+        WHERE learning_progress.status = 'QUEUED'
+          AND learning_progress.excludedAtMillis IS NULL
+          AND instr(trim(learning_items.expression), ' ') > 0
+        ORDER BY learning_progress.queueOrder, learning_items.id
+        LIMIT :limit
+        """,
+    )
+    suspend fun queuedSupplementaryItems(limit: Int): List<LearningItemEntity>
 
     @Query(
         """

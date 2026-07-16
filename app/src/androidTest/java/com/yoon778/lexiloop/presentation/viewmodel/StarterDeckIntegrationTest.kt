@@ -62,18 +62,20 @@ class StarterDeckIntegrationTest {
                         (0 until allocation.count).map { allocationIndex -> allocation.topicId to allocationIndex }
                     }.mapIndexed { index, (topicId, _) ->
                         val number = offset + index
+                        val isCoreWord = index < request.coreWordCount
+                        val expression = if (isCoreWord) "word$number" else "phrase $number"
                         RecommendationItem(
-                            expression = "word$number",
+                            expression = expression,
                             baseForm = null,
-                            itemType = ItemType.WORD,
-                            partOfSpeech = PartOfSpeech.NOUN,
+                            itemType = if (isCoreWord) ItemType.WORD else ItemType.EXPRESSION,
+                            partOfSpeech = if (isCoreWord) PartOfSpeech.NOUN else PartOfSpeech.PHRASE,
                             targetMeaningKo = "뜻$number",
                             auxiliaryMeaningsKo = emptyList(),
                             topicId = topicId,
                             difficulty = Difficulty.INTERMEDIATE,
                             example = RecommendationExample(
                                 template = "Use {{target}} here.",
-                                targetForm = "word$number",
+                                targetForm = expression,
                                 translationKo = "여기에서 사용한다.",
                             ),
                         )
@@ -111,6 +113,8 @@ class StarterDeckIntegrationTest {
 
         assertEquals(6, batch)
         assertEquals(300, database.dao().queuedItems(400).size)
+        assertEquals(240, database.dao().queuedCoreItems(400).size)
+        assertEquals(60, database.dao().queuedSupplementaryItems(400).size)
     }
 
     private companion object {

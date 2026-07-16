@@ -1,6 +1,7 @@
 package com.yoon778.lexiloop.data.gemini
 
 import com.yoon778.lexiloop.domain.learning.normalizeEnglish
+import com.yoon778.lexiloop.domain.model.ItemType
 import java.util.UUID
 
 object GeminiContractValidator {
@@ -49,6 +50,13 @@ object GeminiContractValidator {
         schema(request.schemaVersion)
         uuid(request.requestId, "requestId")
         if (request.requestedCount != 50) fail(GeminiErrorCode.COUNT_MISMATCH, "requestedCount")
+        if (request.coreWordCount !in 1 until request.requestedCount) mismatch("coreWordCount")
+        if (request.supplementaryExpressionCount !in 1 until request.requestedCount) {
+            mismatch("supplementaryExpressionCount")
+        }
+        if (request.coreWordCount + request.supplementaryExpressionCount != request.requestedCount) {
+            fail(GeminiErrorCode.COUNT_MISMATCH, "coreWordCount")
+        }
         if (request.topicAllocations.size !in 1..5) mismatch("topicAllocations")
         request.topicAllocations.forEachIndexed { index, allocation ->
             uuid(allocation.topicId, "topicAllocations[$index].topicId")
@@ -102,6 +110,19 @@ object GeminiContractValidator {
                 fail(GeminiErrorCode.TOPIC_ALLOCATION_MISMATCH, "items.topicId")
             }
         }
+
+        val coreWords = response.items.filter { it.expression.isSingleToken() }
+        if (coreWords.size != request.coreWordCount ||
+            coreWords.any { it.itemType !in coreWordTypes }
+        ) {
+            fail(GeminiErrorCode.COUNT_MISMATCH, "items.coreWords")
+        }
+        val supplementaryExpressions = response.items.filterNot { it.expression.isSingleToken() }
+        if (supplementaryExpressions.size != request.supplementaryExpressionCount ||
+            supplementaryExpressions.any { it.itemType !in supplementaryExpressionTypes }
+        ) {
+            fail(GeminiErrorCode.COUNT_MISMATCH, "items.supplementaryExpressions")
+        }
     }
 
     private fun validateExample(example: RecommendationExample, parentPath: String) {
@@ -142,4 +163,13 @@ object GeminiContractValidator {
         throw GeminiContractException(code, path)
 
     private val forbiddenText = Regex("[\\u0000-\\u001F]|```|<[^>]+>")
+    private val coreWordTypes = setOf(ItemType.WORD, ItemType.TECH_TERM)
+    private val supplementaryExpressionTypes = setOf(
+        ItemType.IDIOM,
+        ItemType.PHRASAL_VERB,
+        ItemType.TECH_TERM,
+        ItemType.EXPRESSION,
+    )
+
+    private fun String.isSingleToken(): Boolean = trim().none(Char::isWhitespace)
 }

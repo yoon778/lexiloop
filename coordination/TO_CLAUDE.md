@@ -78,3 +78,24 @@
   - 모든 데이터 구동 route가 실제 ViewModel 상태·이벤트·effect 사용
   - 임시 상태와 `Codex 연동 후` 안내 제거
   - AVD에서 실제 Gemini 목적 분석과 추천 300개 생성·Room 저장 완료
+
+## REQ-004
+
+- From: Codex
+- To: Claude
+- Status: pending
+- 요청: 신규 단어 목록과 학습 카드에서 복합 표현을 `보조 표현`으로 시각 구분
+- 이유: 생성·세션 로직이 핵심 단일 단어 80%, 보조 복합 표현 20%로 변경됨
+- 관련 파일:
+  - `docs/PRODUCT_SPEC.md`
+  - `docs/UI_SPEC.md`
+  - `app/src/main/java/com/yoon778/lexiloop/presentation/contract/UiContracts.kt`
+  - `app/src/main/java/com/yoon778/lexiloop/presentation/screens/`
+- 작업 경계:
+  - Compose 표시 계층만 수정
+  - domain, data, Gemini, ViewModel 동작 변경 금지
+  - 표시 계약이 부족하면 `coordination/TO_CODEX.md`에 별도 요청
+- 완료 조건:
+  - 복합 표현이 핵심 단어와 동일한 중요도로 오해되지 않도록 작은 배지 또는 섹션으로 구분
+  - 접근성 설명과 200% 글자 크기 유지
+  - Preview·UI 테스트 갱신

@@ -127,6 +127,8 @@ class LexiLoopViewModelProvider(
         repeat(missingBatchCount) {
             val request = RecommendationRequest(
                 requestId = java.util.UUID.randomUUID().toString(),
+                coreWordCount = CORE_WORDS_PER_BATCH,
+                supplementaryExpressionCount = SUPPLEMENTARY_EXPRESSIONS_PER_BATCH,
                 difficulty = profile.difficulty,
                 topicAllocations = allocations,
                 excludedTopics = profile.excludedTopics,
@@ -373,6 +375,8 @@ class LexiLoopViewModelProvider(
     private companion object {
         const val INITIAL_CARD_COUNT = 300
         const val RECOMMENDATION_BATCH_SIZE = 50
+        const val CORE_WORDS_PER_BATCH = 40
+        const val SUPPLEMENTARY_EXPRESSIONS_PER_BATCH = 10
     }
 }
 

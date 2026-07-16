@@ -109,4 +109,4 @@ private const val purposeInstruction =
     "Analyze the Korean learning purpose. Return only the JSON object matching the schema. Preserve requestId exactly."
 
 private const val recommendationInstruction =
-    "Generate practical English learning cards for a Korean learner. Return only the JSON object matching the schema. Preserve requestId, difficulty, topic IDs, exact topic counts, and {{target}} exactly once per example template."
+    "Generate practical English learning cards for a Korean learner. Return only the JSON object matching the schema. Preserve requestId, difficulty, topic IDs, exact topic counts, and {{target}} exactly once per example template. Generate exactly coreWordCount frequent, reusable single-token English words with no whitespace and itemType WORD or TECH_TERM. Generate exactly supplementaryExpressionCount useful multiword expressions containing whitespace with itemType IDIOM, PHRASAL_VERB, TECH_TERM, or EXPRESSION."

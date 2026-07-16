@@ -77,6 +77,31 @@ class RoomLearningRepositoryTest {
     }
 
     @Test
+    fun newSessionUsesFourCoreWordsThenOneSupplementaryExpression() = runTest {
+        repository.insertBatch(
+            drafts = listOf(
+                draft("phrase one"),
+                draft("deploy"),
+                draft("grocery"),
+                draft("maintain"),
+                draft("reliable"),
+                draft("phrase two"),
+            ),
+            generationBatchId = "batch",
+            nowMillis = 100,
+        )
+
+        val started = repository.startNewSession(
+            today = LocalDate.of(2026, 7, 15),
+            goalCount = 5,
+            nowMillis = 200,
+        ) as SessionStartResult.Started
+        val expressions = started.items.map { requireNotNull(database.dao().learningItem(it.itemId)).expression }
+
+        assertEquals(listOf("deploy", "grocery", "maintain", "reliable", "phrase one"), expressions)
+    }
+
+    @Test
     fun reviewPassAdvancesSchedule() = runTest {
         repository.insertBatch(listOf(draft("maintain")), "batch", nowMillis = 100)
         val newSession = repository.startNewSession(

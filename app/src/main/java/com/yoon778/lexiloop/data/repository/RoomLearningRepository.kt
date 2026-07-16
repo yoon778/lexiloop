@@ -86,7 +86,19 @@ class RoomLearningRepository(
             return@withTransaction SessionStartResult.Locked(dueCount)
         }
 
-        val items = dao.queuedItems(goalCount)
+        val supplementaryTarget = goalCount * SUPPLEMENTARY_PERCENT / 100
+        val coreTarget = goalCount - supplementaryTarget
+        var coreItems = dao.queuedCoreItems(coreTarget)
+        var supplementaryItems = dao.queuedSupplementaryItems(supplementaryTarget)
+        val missingCount = goalCount - coreItems.size - supplementaryItems.size
+        if (missingCount > 0) {
+            if (coreItems.size < coreTarget) {
+                supplementaryItems = dao.queuedSupplementaryItems(supplementaryTarget + missingCount)
+            } else {
+                coreItems = dao.queuedCoreItems(coreTarget + missingCount)
+            }
+        }
+        val items = coreItems + supplementaryItems
         if (items.isEmpty()) return@withTransaction SessionStartResult.Empty
 
         createSession(
@@ -403,6 +415,10 @@ class RoomLearningRepository(
         if (dao.unfinishedSessionItemCount(sessionId) == 0) {
             dao.setSessionStatus(sessionId, SessionStatus.COMPLETED, nowMillis)
         }
+    }
+
+    private companion object {
+        const val SUPPLEMENTARY_PERCENT = 20
     }
 }
 

@@ -62,18 +62,23 @@ class GeminiRepositoryTest {
             schemaVersion = 1,
             requestId = request.requestId,
             items = (0 until 50).map { index ->
+                val expression = if (index < request.coreWordCount) {
+                    "word$index"
+                } else {
+                    "phrase $index"
+                }
                 RecommendationItem(
-                    expression = "word$index",
+                    expression = expression,
                     baseForm = null,
-                    itemType = ItemType.WORD,
-                    partOfSpeech = PartOfSpeech.NOUN,
+                    itemType = if (index < request.coreWordCount) ItemType.WORD else ItemType.EXPRESSION,
+                    partOfSpeech = if (index < request.coreWordCount) PartOfSpeech.NOUN else PartOfSpeech.PHRASE,
                     targetMeaningKo = "뜻$index",
                     auxiliaryMeaningsKo = emptyList(),
                     topicId = if (index < 25) request.topicAllocations[0].topicId else request.topicAllocations[1].topicId,
                     difficulty = Difficulty.INTERMEDIATE,
                     example = RecommendationExample(
                         template = "Use {{target}} here.",
-                        targetForm = "word$index",
+                        targetForm = expression,
                         translationKo = "여기에서 사용한다.",
                     ),
                 )
@@ -84,6 +89,38 @@ class GeminiRepositoryTest {
         val result = repository.generateRecommendations(request) as GeminiCallResult.Success
 
         assertEquals(50, result.value.items.size)
+    }
+
+    @Test
+    fun `recommendation rejects a batch without the required core word ratio`() = runTest {
+        val request = recommendationRequest()
+        val response = RecommendationResponse(
+            schemaVersion = 1,
+            requestId = request.requestId,
+            items = (0 until 50).map { index ->
+                RecommendationItem(
+                    expression = "word$index",
+                    baseForm = null,
+                    itemType = ItemType.WORD,
+                    partOfSpeech = PartOfSpeech.NOUN,
+                    targetMeaningKo = "meaning$index",
+                    auxiliaryMeaningsKo = emptyList(),
+                    topicId = if (index < 25) request.topicAllocations[0].topicId else request.topicAllocations[1].topicId,
+                    difficulty = Difficulty.INTERMEDIATE,
+                    example = RecommendationExample(
+                        template = "Use {{target}} here.",
+                        targetForm = "word$index",
+                        translationKo = "translation$index",
+                    ),
+                )
+            },
+        )
+        val repository = GeminiRepository(GeminiTransport { contractJson.encodeToString(response) })
+
+        val result = repository.generateRecommendations(request) as GeminiCallResult.Failure
+
+        assertEquals(GeminiErrorCode.COUNT_MISMATCH, result.error.code)
+        assertEquals("items.coreWords", result.error.fieldPath)
     }
 
     @Test

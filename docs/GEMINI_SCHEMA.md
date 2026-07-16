@@ -38,12 +38,15 @@
 앱이 분야별 개수를 계산해 요청함. Gemini가 비율을 재계산하지 않음
 
 - 최초 단어장은 50개 배치 6회로 300개 생성
+- 요청에 `coreWordCount=40`, `supplementaryExpressionCount=10` 포함
 - 저장된 생성 배치 수를 확인해 중단 후 재시도 시 부족한 배치만 생성
 - API 스키마에는 복잡도 제한 때문에 `items`의 50개 제한을 넣지 않고 앱 검증기에서 정확히 50개를 강제
 
 출력:
 
 - 항목 정확히 50개
+- 공백 없는 핵심 단일 단어 정확히 40개, `WORD` 또는 `TECH_TERM`
+- 공백이 있는 보조 복합 표현 정확히 10개, `IDIOM`, `PHRASAL_VERB`, `TECH_TERM`, `EXPRESSION` 중 하나
 - 분야별 개수는 요청 할당과 정확히 일치
 - 난이도는 요청과 일치
 - `expression + partOfSpeech + targetMeaningKo` 중복 금지

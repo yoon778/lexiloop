@@ -46,6 +46,8 @@ data class RecommendationRequest(
     val schemaVersion: Int = 1,
     val requestId: String,
     val requestedCount: Int = 50,
+    val coreWordCount: Int = 40,
+    val supplementaryExpressionCount: Int = 10,
     val difficulty: Difficulty,
     val topicAllocations: List<RecommendationTopicAllocation>,
     val excludedTopics: List<String>,

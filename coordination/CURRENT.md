@@ -1,17 +1,18 @@
 # 현재 상태
 
-- 현재 단계: 실제 Gemini 연결 완료
+- 현재 단계: 핵심 단어 중심 추천 재설계 완료
 - 현재 담당: Codex
-- 현재 작업: 커밋·푸시
-- 마지막 완료: AVD에서 실제 목적 분석, 추천 300개 생성, Room 저장, 수준 진단 진입
-- 기준 커밋: `90a0d40`
-- 검증: 실제 Gemini 목적 분석·추천 생성 성공. 단위 테스트·assemble·lint·AVD Android 테스트 13개 통과
-- 수정 파일: Gemini 검증, DAO, presentation route·계약·ViewModel, Android 통합 테스트, 문서
-- 미완료 부분: 없음
-- 다음 행동: Claude에 실제 데이터 상태 기반 UI 다듬기 인계
+- 현재 작업: 핸드폰 기존 데이터 초기화·최신 APK 설치
+- 마지막 완료: 생성 50개당 단일 단어 40개·보조 표현 10개 계약과 신규 세션 80:20 우선순위 구현
+- 기준 커밋: `a5d091d`
+- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. 실제 폰 저장소·생성 통합 테스트 7개 통과
+- 수정 파일: Gemini 계약·검증·프롬프트, DAO, 저장소, ViewModel, 단위·Android 통합 테스트, 제품·구조 문서
+- 미완료 부분: Claude 보조 표현 배지 UI, 기기에서 새 Gemini 300개 재생성 확인
+- 다음 행동: 기기 앱 데이터 초기화 후 최신 APK 설치·실행
 - 브랜치: `main`, 원격 `origin` → `https://github.com/yoon778/lexiloop`
 - 보류: 별도 `english` 루트 폴더가 다른 프로세스에 점유됨
 - 블로커: 없음
+- 참고: 실제 폰 전체 Android 테스트 중 기존 Compose UI 테스트 7개는 `No compose hierarchies found`로 실패, 변경 범위 로직 테스트는 별도 통과
 
 ## 작업공간
 
