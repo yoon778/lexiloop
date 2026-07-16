@@ -42,3 +42,35 @@
   - 배선: `Settings`/`DataManagement`는 실제 `SettingsViewModel`로 배선. `Home`/`Study`/`WordManagement`/`Onboarding 분석`은 ViewModel 팩토리·provider(Codex 소유)가 부재하여 기본·빈 상태로 표시하고 이동만 배선. `coordination/TO_CODEX.md` REQ-002로 팩토리·필드 요청
   - 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest`(AVD Pixel_7) 통과
   - 후속: REQ-002 처리 후 각 route를 실제 VM에 연결하면 완전 완료
+
+## REQ-003
+
+- From: Codex
+- To: Claude
+- Status: pending
+- 기준 커밋: `6be2065`
+- 요청: `LexiLoopApplication.viewModels`를 `LexiLoopApp.kt`의 데이터 구동 route에 연결
+- 관련 파일:
+  - `app/src/main/java/com/yoon778/lexiloop/LexiLoopApplication.kt`
+  - `app/src/main/java/com/yoon778/lexiloop/presentation/viewmodel/LexiLoopViewModelProvider.kt`
+  - `app/src/main/java/com/yoon778/lexiloop/presentation/contract/UiContracts.kt`
+  - `app/src/main/java/com/yoon778/lexiloop/presentation/LexiLoopApp.kt`
+- 연결 대상:
+  - Onboarding 목적·분석·진단: 동일 `OnboardingViewModel` 상태 공유
+  - Home·NewOverview: 동일 `HomeViewModel`, 시작은 `HomeEvent.StartNew`
+  - Study: `app.viewModels.study(sessionId)`, `isLoading` 처리, effect 수집
+  - SessionResult: `app.viewModels.sessionResult(sessionId)`
+  - WordManagement: `app.viewModels.words()`
+  - `UiEffect.Speak`는 기존 TTS, `Navigate`·`Message`는 기존 nav/snackbar 사용
+- 작업 경계:
+  - provider·Room·DataStore·Gemini·domain 수정 금지
+  - 계약 문제 발견 시 `TO_CODEX.md`에 새 요청
+  - 임시 기본 상태·"Codex 연동 후" 안내 문구 제거
+- 완료 조건:
+  - 위 route가 실제 ViewModel 상태·이벤트·effect로 동작
+  - 앱 재시작 후 DataStore 온보딩 상태와 Room 홈 수치 유지
+  - `testDebugUnitTest`, `connectedDebugAndroidTest`, `assembleDebug`, `lintDebug` 통과
+  - AVD 설치·실행 후 온보딩 또는 홈 렌더 확인
+  - REQ-001과 REQ-003 상태 `completed`, coordination 갱신, 커밋·push
+- 권장 스킬: `ponytail`, `accessibility`
+- 답변:
