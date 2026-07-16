@@ -77,4 +77,4 @@
   - Codex가 실제 API 검증을 위해 route 배선까지 완료
   - 모든 데이터 구동 route가 실제 ViewModel 상태·이벤트·effect 사용
   - 임시 상태와 `Codex 연동 후` 안내 제거
-  - 실제 Gemini 호출 확인만 로컬 API 키 입력 대기
+  - AVD에서 실제 Gemini 목적 분석과 추천 300개 생성·Room 저장 완료

@@ -30,7 +30,7 @@ class HttpGeminiTransport(
 ) : GeminiTransport {
     override suspend fun request(input: GeminiInteractionInput): String = withContext(Dispatchers.IO) {
         val key = apiKey().trim()
-        if (key.isEmpty()) throw GeminiTransportException(GeminiErrorCode.NETWORK_ERROR)
+        if (key.isEmpty()) throw GeminiTransportException(GeminiErrorCode.NETWORK_ERROR, "apiKey")
 
         val connection = URI(endpoint).toURL().openConnection() as HttpURLConnection
         try {
@@ -52,13 +52,19 @@ class HttpGeminiTransport(
             connection.outputStream.use { it.write(body.encodeToByteArray()) }
 
             if (connection.responseCode !in 200..299) {
-                connection.errorStream?.use { it.readBytes() }
-                throw GeminiTransportException(GeminiErrorCode.NETWORK_ERROR)
+                val errorBody = connection.errorStream?.bufferedReader()?.use { it.readText() }.orEmpty()
+                val fieldPath = extractErrorFieldPath(errorBody)
+                throw GeminiTransportException(
+                    GeminiErrorCode.NETWORK_ERROR,
+                    "http.${connection.responseCode}${fieldPath?.let { ".$it" }.orEmpty()}",
+                )
             }
             val response = connection.inputStream.bufferedReader().use { it.readText() }
             extractOutputText(response)
+        } catch (error: GeminiTransportException) {
+            throw error
         } catch (error: IOException) {
-            throw GeminiTransportException(GeminiErrorCode.NETWORK_ERROR, error)
+            throw GeminiTransportException(GeminiErrorCode.NETWORK_ERROR, "transport", error)
         } finally {
             connection.disconnect()
         }
@@ -67,6 +73,7 @@ class HttpGeminiTransport(
 
 class GeminiTransportException(
     val code: GeminiErrorCode,
+    val fieldPath: String = "transport",
     cause: Throwable? = null,
 ) : IOException(code.name, cause)
 
@@ -100,9 +107,9 @@ private data class GenerationConfig(
 
 private fun extractOutputText(rawResponse: String): String {
     val root = runCatching { apiJson.parseToJsonElement(rawResponse).jsonObject }
-        .getOrElse { throw GeminiTransportException(GeminiErrorCode.INVALID_JSON, it) }
+        .getOrElse { throw GeminiTransportException(GeminiErrorCode.INVALID_JSON, "response", it) }
     if (root["status"]?.jsonPrimitive?.contentOrNull != "completed") {
-        throw GeminiTransportException(GeminiErrorCode.NETWORK_ERROR)
+        throw GeminiTransportException(GeminiErrorCode.NETWORK_ERROR, "status")
     }
     val texts = root["steps"]?.jsonArray.orEmpty()
         .filter { it.jsonObject["type"]?.jsonPrimitive?.contentOrNull == "model_output" }
@@ -110,12 +117,24 @@ private fun extractOutputText(rawResponse: String): String {
         .filter { content -> content.jsonObject["type"]?.jsonPrimitive?.contentOrNull == "text" }
         .mapNotNull { content -> content.jsonObject["text"]?.jsonPrimitive?.contentOrNull }
     return texts.joinToString(separator = "").ifBlank {
-        throw GeminiTransportException(GeminiErrorCode.INVALID_JSON)
+        throw GeminiTransportException(GeminiErrorCode.INVALID_JSON, "response")
     }
 }
+
+private fun extractErrorFieldPath(rawResponse: String): String? = runCatching {
+    val error = apiJson.parseToJsonElement(rawResponse).jsonObject["error"]?.jsonObject ?: return@runCatching null
+    error["details"]?.jsonArray.orEmpty()
+        .flatMap { it.jsonObject["fieldViolations"]?.jsonArray.orEmpty() }
+        .firstNotNullOfOrNull { violation ->
+            violation.jsonObject["field"]?.jsonPrimitive?.contentOrNull
+        }
+        ?.takeIf { SAFE_FIELD_PATH.matches(it) }
+}.getOrNull()
 
 private val apiJson = Json {
     ignoreUnknownKeys = true
     explicitNulls = false
     encodeDefaults = true
 }
+
+private val SAFE_FIELD_PATH = Regex("^[A-Za-z0-9_.\\[\\]-]{1,160}$")

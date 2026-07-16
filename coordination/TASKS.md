@@ -40,4 +40,4 @@
 - [x] `completed` Claude Compose UI 인계
 - [x] `completed` 실제 ViewModel route 배선
 - [x] `completed` Gemini 추천 300개 생성·Room 저장 통합 테스트
-- [ ] `blocked` 사용자 로컬 API 키 입력 후 실제 Gemini 호출 확인
+- [x] `completed` 실제 Gemini 목적 분석·추천 300개 생성 확인

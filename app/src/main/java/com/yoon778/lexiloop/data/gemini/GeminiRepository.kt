@@ -58,9 +58,10 @@ class GeminiRepository(
                     ),
                 )
             }.getOrElse { error ->
+                val transportError = error as? GeminiTransportException
                 lastFailure = GeminiFailure(
-                    code = (error as? GeminiTransportException)?.code ?: GeminiErrorCode.NETWORK_ERROR,
-                    fieldPath = "transport",
+                    code = transportError?.code ?: GeminiErrorCode.NETWORK_ERROR,
+                    fieldPath = transportError?.fieldPath ?: "transport",
                     attempts = attempt,
                 )
                 return@repeat

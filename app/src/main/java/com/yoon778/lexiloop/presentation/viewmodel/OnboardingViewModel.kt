@@ -78,9 +78,11 @@ class OnboardingViewModel(
             }.onSuccess {
                 mutableState.value = state.value.copy(isGenerating = false)
                 emit(UiEffect.Navigate(AppRoute.Diagnosis))
-            }.onFailure {
+            }.onFailure { error ->
                 mutableState.value = state.value.copy(isGenerating = false)
-                emit(UiEffect.Message("단어 생성에 실패했어요. API 키와 네트워크를 확인해주세요"))
+                val diagnostic = error.message?.takeIf(SAFE_DIAGNOSTIC::matches)
+                val suffix = diagnostic?.let { " ($it)" }.orEmpty()
+                emit(UiEffect.Message("단어 생성에 실패했어요$suffix"))
             }
         }
     }
@@ -104,6 +106,7 @@ class OnboardingViewModel(
     }
 
     private companion object {
+        val SAFE_DIAGNOSTIC = Regex("^[A-Z_]+:[A-Za-z0-9_.\\[\\]-]+$")
         val diagnosisWords = listOf(
             "apple", "travel", "choose", "maintain", "grocery",
             "feature", "deploy", "reliable", "negotiate", "efficient",

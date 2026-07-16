@@ -31,7 +31,7 @@ internal val recommendationResponseSchema: JsonObject = schemaJson.parseToJsonEl
       "properties":{
         "schemaVersion":{"type":"integer","enum":[1]},
         "requestId":{"type":"string"},
-        "items":{"type":"array","minItems":50,"maxItems":50,"items":{"type":"object","additionalProperties":false,
+        "items":{"type":"array","items":{"type":"object","additionalProperties":false,
           "properties":{
             "expression":{"type":"string"},
             "baseForm":{"type":["string","null"]},
