@@ -88,6 +88,7 @@ LoadState<T>
 
 - `purposeText`, `difficulty`, `dailyNewCount`
 - `isSubmitEnabled`, `isAnalyzing`, `fieldErrors`
+- `diagnosisWord`, `diagnosisIndex`, `diagnosisTotal`
 
 `OnboardingEvent`
 
@@ -147,7 +148,8 @@ LoadState<T>
 - `dueReviewCount`, `dailyNewGoal`, `availableNewCount`
 - `streakDays`, `learnedTotal`
 - `newStudyLocked`, `lockReason`
-- `activeSessionType`, `isOffline`
+- `activeSessionType`, `activeSessionId`, `isOffline`
+- `newItems`: 오늘의 신규 목록 `LoadState<List<Pair<String, String>>>`
 
 규칙
 
@@ -196,6 +198,7 @@ LoadState<T>
 - `auxiliaryMeanings`, `exampleSentence`, `exampleTranslationKo`
 - `phase`, `phaseContent`, `answerText`, `hint`, `feedback`
 - `canSubmit`, `isSubmitting`, `canGoBack`
+- `isLoading`
 
 `StudyEvent`
 

@@ -12,12 +12,24 @@ data class StudyTransition(
 )
 
 class StudyViewModel(
-    initialState: StudyUiState,
+    sessionId: String,
+    private val loadInitial: suspend () -> StudyUiState,
     private val reduce: suspend (StudyUiState, StudyEvent) -> StudyTransition,
-) : ContractViewModel<StudyUiState, StudyEvent>(initialState) {
+) : ContractViewModel<StudyUiState, StudyEvent>(loadingState(sessionId)) {
+    init {
+        viewModelScope.launch {
+            runCatching { loadInitial() }
+                .onSuccess { mutableState.value = it }
+                .onFailure { emit(UiEffect.Message("학습 세션을 불러오지 못했어요")) }
+        }
+    }
+
     override fun onEvent(event: StudyEvent) {
         if (event is StudyEvent.AnswerChanged) {
-            mutableState.value = state.value.copy(answerText = event.value)
+            mutableState.value = state.value.copy(
+                answerText = event.value,
+                canSubmit = event.value.isNotBlank(),
+            )
             return
         }
         if (event == StudyEvent.RepeatPronunciation) {
@@ -34,3 +46,18 @@ class StudyViewModel(
         }
     }
 }
+
+private fun loadingState(sessionId: String) = StudyUiState(
+    sessionId = sessionId,
+    sessionType = com.yoon778.lexiloop.domain.model.SessionType.NEW,
+    completedCount = 0,
+    totalCount = 0,
+    itemId = "",
+    expression = "",
+    targetMeaningKo = "",
+    exampleSentence = "",
+    exampleTranslationKo = "",
+    phase = com.yoon778.lexiloop.domain.model.LearningPhase.CARD,
+    canGoBack = false,
+    isLoading = true,
+)

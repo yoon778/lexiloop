@@ -143,6 +143,26 @@ class RoomLearningRepositoryTest {
         assertTrue(restored?.queueOrder != null)
     }
 
+    @Test
+    fun managementQueryAndFullyKnownUseStoredProgress() = runTest {
+        repository.insertBatch(
+            listOf(draft("deploy"), draft("grocery")),
+            "batch",
+            nowMillis = 100,
+        )
+        val deploy = database.dao().managedWords("deploy", null).single()
+
+        repository.markItemFullyKnown(
+            itemId = deploy.id,
+            today = LocalDate.of(2026, 7, 15),
+            nowMillis = 200,
+        )
+
+        val reviewing = database.dao().managedWords("", LearningStatus.REVIEWING).single()
+        assertEquals("deploy", reviewing.expression)
+        assertEquals(5, database.dao().progress(reviewing.id)?.intervalIndex)
+    }
+
     private fun draft(expression: String) = LearningItemDraft(
         expression = expression,
         baseForm = null,

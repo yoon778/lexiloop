@@ -22,6 +22,9 @@ data class OnboardingUiState(
     val analysis: LoadState<RecommendationProfile>? = null,
     val isAnalyzing: Boolean = false,
     val fieldErrors: Map<String, String> = emptyMap(),
+    val diagnosisWord: String = "maintain",
+    val diagnosisIndex: Int = 1,
+    val diagnosisTotal: Int = 20,
 ) {
     val isSubmitEnabled: Boolean get() = purposeText.isNotBlank() && !isAnalyzing
 }
@@ -46,6 +49,8 @@ data class HomeUiState(
     val newStudyLocked: Boolean = false,
     val lockReason: String? = null,
     val activeSessionType: SessionType? = null,
+    val activeSessionId: String? = null,
+    val newItems: LoadState<List<Pair<String, String>>> = LoadState.Loading,
     val isOffline: Boolean = false,
     val isLoading: Boolean = true,
 )
@@ -54,6 +59,7 @@ sealed interface HomeEvent {
     data object Refresh : HomeEvent
     data object StartReview : HomeEvent
     data object OpenNewOverview : HomeEvent
+    data object StartNew : HomeEvent
     data object ContinueSession : HomeEvent
     data object OpenWordManagement : HomeEvent
     data object OpenSettings : HomeEvent
@@ -80,6 +86,7 @@ data class StudyUiState(
     val canSubmit: Boolean = false,
     val isSubmitting: Boolean = false,
     val canGoBack: Boolean = true,
+    val isLoading: Boolean = false,
 )
 
 data class StudyFeedback(val correct: Boolean, val message: String)

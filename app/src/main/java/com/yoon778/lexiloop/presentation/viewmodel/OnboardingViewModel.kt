@@ -15,7 +15,8 @@ import java.util.UUID
 
 class OnboardingViewModel(
     private val analyze: suspend (PurposeAnalysisRequest) -> PurposeAnalysisResponse,
-    private val saveProfile: suspend (String, Int, RecommendationProfile) -> Unit,
+    private val saveProfile: suspend (RecommendationProfile) -> Unit,
+    private val completeOnboarding: suspend (String, Int, RecommendationProfile) -> Unit,
 ) : ContractViewModel<OnboardingUiState, OnboardingEvent>(OnboardingUiState()) {
     override fun onEvent(event: OnboardingEvent) {
         when (event) {
@@ -24,8 +25,11 @@ class OnboardingViewModel(
             is OnboardingEvent.DailyNewCountSelected -> mutableState.value = state.value.copy(dailyNewCount = event.value.coerceIn(1, 100))
             OnboardingEvent.AnalyzeRequested, OnboardingEvent.RetryRequested -> requestAnalysis()
             OnboardingEvent.AnalysisAccepted -> acceptAnalysis()
-            OnboardingEvent.UseStarterDeck -> emit(UiEffect.Navigate(AppRoute.Diagnosis))
-            is OnboardingEvent.DiagnosisAnswered -> Unit
+            OnboardingEvent.UseStarterDeck -> {
+                mutableState.value = state.value.copy(analysis = LoadState.Content(RecommendationProfile()))
+                emit(UiEffect.Navigate(AppRoute.Diagnosis))
+            }
+            is OnboardingEvent.DiagnosisAnswered -> advanceDiagnosis()
         }
     }
 
@@ -66,9 +70,36 @@ class OnboardingViewModel(
         val current = state.value
         val profile = (current.analysis as? LoadState.Content)?.value ?: return
         viewModelScope.launch {
-            runCatching { saveProfile(current.purposeText, current.dailyNewCount, profile) }
+            runCatching { saveProfile(profile) }
                 .onSuccess { emit(UiEffect.Navigate(AppRoute.Diagnosis)) }
                 .onFailure { emit(UiEffect.Message("설정을 저장하지 못했어요")) }
         }
+    }
+
+    private fun advanceDiagnosis() {
+        val current = state.value
+        if (current.diagnosisIndex < diagnosisWords.size) {
+            val nextIndex = current.diagnosisIndex + 1
+            mutableState.value = current.copy(
+                diagnosisIndex = nextIndex,
+                diagnosisWord = diagnosisWords[nextIndex - 1],
+            )
+            return
+        }
+        val profile = (current.analysis as? LoadState.Content)?.value ?: RecommendationProfile()
+        viewModelScope.launch {
+            runCatching { completeOnboarding(current.purposeText, current.dailyNewCount, profile) }
+                .onSuccess { emit(UiEffect.Navigate(AppRoute.Home, clearBackStack = true)) }
+                .onFailure { emit(UiEffect.Message("온보딩을 저장하지 못했어요")) }
+        }
+    }
+
+    private companion object {
+        val diagnosisWords = listOf(
+            "apple", "travel", "choose", "maintain", "grocery",
+            "feature", "deploy", "reliable", "negotiate", "efficient",
+            "architecture", "consequence", "ambiguous", "sustainable", "collaborate",
+            "meticulous", "ubiquitous", "pragmatic", "resilient", "counterintuitive",
+        )
     }
 }

@@ -1,14 +1,14 @@
 # 현재 상태
 
-- 현재 단계: Claude Compose UI 표시 계층 구현 완료 (REQ-001 partially-completed)
-- 현재 담당: 없음
-- 현재 작업: 없음
-- 마지막 완료: presentation 표시 계층(테마, 컴포넌트, 10개 route 화면, Nav3 호스트, Preview, UI 테스트) 구현 및 검증
-- 기준 커밋: `d31f748`
-- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest` AVD Pixel_7에서 11개 통과(0 실패). debug APK 설치·콜드 스타트 렌더 확인
+- 현재 단계: 실제 데이터 배선
+- 현재 담당: Claude 재인계 준비
+- 현재 작업: Codex REQ-002 완료, Compose route 실제 ViewModel 연결 대기
+- 마지막 완료: ViewModel provider, Room/DataStore/Gemini, 실제 학습 세션 로직 연결
+- 기준 커밋: `bc4da61`
+- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest` AVD Pixel_7에서 12개 통과(0 실패)
 - 수정 파일: `app/src/main/.../presentation/**`, `app/src/androidTest/.../presentation/**`, `app/build.gradle.kts`, `gradle/libs.versions.toml`, coordination 문서
-- 미완료 부분: 데이터 구동 화면(Home/Study/WordManagement/Onboarding 분석)을 실제 ViewModel에 연결 — Codex 팩토리·필드 대기 (`coordination/TO_CODEX.md` REQ-002)
-- 다음 행동: Codex가 REQ-002 처리 후 Claude가 `LexiLoopApp.kt`의 각 route를 실제 VM에 연결
+- 미완료 부분: `LexiLoopApp.kt` 각 route에서 `LexiLoopApplication.viewModels` 사용
+- 다음 행동: Claude가 표시 계층에서 provider를 수집하고 effect·화면에 연결
 - 브랜치: `main`, 원격 `origin` → `https://github.com/yoon778/lexiloop`
 - 보류: 별도 `english` 루트 폴더가 다른 프로세스에 점유됨
 - 블로커: 없음

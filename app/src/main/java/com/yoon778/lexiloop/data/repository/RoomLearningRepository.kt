@@ -3,6 +3,8 @@ package com.yoon778.lexiloop.data.repository
 import androidx.room.withTransaction
 import com.yoon778.lexiloop.data.local.LexiLoopDatabase
 import com.yoon778.lexiloop.data.local.entity.AuxiliaryMeaningEntity
+import com.yoon778.lexiloop.data.local.entity.ErrorNoteCategory
+import com.yoon778.lexiloop.data.local.entity.ErrorNoteEntity
 import com.yoon778.lexiloop.data.local.entity.LearningItemEntity
 import com.yoon778.lexiloop.data.local.entity.LearningProgressEntity
 import com.yoon778.lexiloop.data.local.entity.SessionItemEntity
@@ -131,6 +133,8 @@ class RoomLearningRepository(
                 retryPhase = step.retryPhase,
                 knownPath = step.knownPath,
                 phaseFailureCount = step.phaseFailureCount,
+                hadInitialReviewError = current.hadInitialReviewError ||
+                    step.phase == LearningPhase.CORRECTION,
                 lastSubmittedAnswer = lastSubmittedAnswer,
                 updatedAtMillis = nowMillis,
             ),
@@ -175,6 +179,24 @@ class RoomLearningRepository(
             updatedAtMillis = nowMillis,
         )
         completeSessionItem(sessionId, itemId, nowMillis)
+    }
+
+    suspend fun markItemFullyKnown(
+        itemId: String,
+        today: LocalDate,
+        nowMillis: Long,
+    ) = database.withTransaction {
+        val progress = requireNotNull(dao.progress(itemId))
+        dao.updateProgressState(
+            itemId = itemId,
+            status = LearningStatus.REVIEWING,
+            queueOrder = null,
+            intervalIndex = 5,
+            dueEpochDay = today.plusDays(30).toEpochDay(),
+            learnedEpochDay = progress.learnedEpochDay ?: today.toEpochDay(),
+            masteredEpochDay = null,
+            updatedAtMillis = nowMillis,
+        )
     }
 
     suspend fun completeReviewItem(
@@ -229,6 +251,12 @@ class RoomLearningRepository(
             completeSessionIfFinished(sessionId, nowMillis)
         }
 
+    suspend fun deferReviewItem(sessionId: String, itemId: String, nowMillis: Long) =
+        database.withTransaction {
+            dao.setSessionItemState(sessionId, itemId, SessionItemState.DEFERRED, nowMillis)
+            completeSessionIfFinished(sessionId, nowMillis)
+        }
+
     suspend fun excludeItem(itemId: String, nowMillis: Long) =
         dao.setExcluded(itemId, nowMillis, nowMillis)
 
@@ -267,6 +295,21 @@ class RoomLearningRepository(
                 ),
             )
         }
+
+    suspend fun addErrorNote(itemId: String, note: String, nowMillis: Long) {
+        val text = note.trim()
+        require(text.isNotEmpty())
+        dao.insertErrorNote(
+            ErrorNoteEntity(
+                id = newId(),
+                itemId = itemId,
+                category = ErrorNoteCategory.MEANING,
+                note = text,
+                createdAtMillis = nowMillis,
+                resolvedAtMillis = null,
+            ),
+        )
+    }
 
     suspend fun expireOldSessions(today: LocalDate, nowMillis: Long) = database.withTransaction {
         dao.expiredSessionCandidates(today.toEpochDay()).forEach { session ->

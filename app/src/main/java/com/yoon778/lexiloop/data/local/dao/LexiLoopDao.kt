@@ -59,6 +59,18 @@ interface LexiLoopDao {
     suspend fun sessionItem(sessionId: String, itemId: String): SessionItemEntity?
 
     @Query(
+        "SELECT * FROM session_items WHERE sessionId = :sessionId " +
+            "AND state NOT IN ('COMPLETED', 'DEFERRED') ORDER BY queueOrder LIMIT 1",
+    )
+    suspend fun currentSessionItem(sessionId: String): SessionItemEntity?
+
+    @Query("SELECT COUNT(*) FROM session_items WHERE sessionId = :sessionId AND state = 'COMPLETED'")
+    suspend fun completedSessionItemCount(sessionId: String): Int
+
+    @Query("SELECT * FROM auxiliary_meanings WHERE itemId = :itemId ORDER BY sortOrder")
+    suspend fun auxiliaryMeanings(itemId: String): List<AuxiliaryMeaningEntity>
+
+    @Query(
         """
         SELECT * FROM study_sessions
         WHERE epochDay = :epochDay AND type = :type AND status = 'ACTIVE'
@@ -119,6 +131,29 @@ interface LexiLoopDao {
         """,
     )
     fun queuedCount(): Flow<Int>
+
+    @Query("SELECT epochDay FROM study_sessions WHERE status = 'COMPLETED' ORDER BY epochDay DESC")
+    suspend fun completedSessionEpochDays(): List<Long>
+
+    @Query(
+        """
+        SELECT learning_items.id AS id, learning_items.expression AS expression,
+               learning_items.targetMeaningKo AS targetMeaningKo,
+               learning_progress.status AS status,
+               learning_progress.excludedAtMillis AS excludedAtMillis
+        FROM learning_items
+        JOIN learning_progress ON learning_progress.itemId = learning_items.id
+        WHERE (:status IS NULL OR learning_progress.status = :status)
+          AND (:query = '' OR learning_items.normalizedExpression LIKE '%' || :query || '%'
+               OR learning_items.targetMeaningKo LIKE '%' || :query || '%')
+        ORDER BY learning_items.normalizedExpression
+        LIMIT 500
+        """,
+    )
+    suspend fun managedWords(query: String, status: LearningStatus?): List<ManagedWordRow>
+
+    @Query("SELECT * FROM learning_items WHERE id != :itemId ORDER BY id LIMIT :limit")
+    suspend fun distractorItems(itemId: String, limit: Int): List<LearningItemEntity>
 
     @Query(
         """
@@ -183,3 +218,11 @@ interface LexiLoopDao {
     @Query("DELETE FROM learning_items WHERE id IN (SELECT itemId FROM learning_progress WHERE status = 'QUEUED' AND excludedAtMillis IS NULL)")
     suspend fun deleteAvailableQueuedItems()
 }
+
+data class ManagedWordRow(
+    val id: String,
+    val expression: String,
+    val targetMeaningKo: String,
+    val status: LearningStatus,
+    val excludedAtMillis: Long?,
+)
