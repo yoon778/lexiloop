@@ -108,7 +108,7 @@ object GeminiContractValidator {
         length(example.template, 1, 240, "$parentPath.example.template")
         length(example.targetForm, 1, 80, "$parentPath.example.targetForm")
         length(example.translationKo, 1, 240, "$parentPath.example.translationKo")
-        if (Regex("\\{\\{target}}", RegexOption.IGNORE_CASE).findAll(example.template).count() != 1) {
+        if (Regex("\\{\\{target\\}\\}", RegexOption.IGNORE_CASE).findAll(example.template).count() != 1) {
             fail(GeminiErrorCode.INVALID_EXAMPLE, "$parentPath.example.template")
         }
     }

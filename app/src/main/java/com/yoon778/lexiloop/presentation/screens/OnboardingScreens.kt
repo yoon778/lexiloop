@@ -113,6 +113,7 @@ fun OnboardingAnalysisScreen(
     onBack: () -> Unit,
     onRetry: () -> Unit,
     onUseStarter: () -> Unit,
+    isGenerating: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     ScreenScaffold(title = "분석 결과", modifier = modifier, onBack = onBack) { padding ->
@@ -162,6 +163,8 @@ fun OnboardingAnalysisScreen(
                     PrimaryButton(
                         "이대로 생성",
                         onClick = onAccept,
+                        enabled = !isGenerating,
+                        loading = isGenerating,
                         modifier = Modifier.weight(1f),
                     )
                 }

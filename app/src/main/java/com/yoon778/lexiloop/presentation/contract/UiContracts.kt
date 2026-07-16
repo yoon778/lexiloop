@@ -21,6 +21,7 @@ data class OnboardingUiState(
     val dailyNewCount: Int = 20,
     val analysis: LoadState<RecommendationProfile>? = null,
     val isAnalyzing: Boolean = false,
+    val isGenerating: Boolean = false,
     val fieldErrors: Map<String, String> = emptyMap(),
     val diagnosisWord: String = "maintain",
     val diagnosisIndex: Int = 1,

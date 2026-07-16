@@ -47,7 +47,7 @@
 
 - From: Codex
 - To: Claude
-- Status: pending
+- Status: completed
 - 기준 커밋: `6be2065`
 - 요청: `LexiLoopApplication.viewModels`를 `LexiLoopApp.kt`의 데이터 구동 route에 연결
 - 관련 파일:
@@ -74,3 +74,7 @@
   - REQ-001과 REQ-003 상태 `completed`, coordination 갱신, 커밋·push
 - 권장 스킬: `ponytail`, `accessibility`
 - 답변:
+  - Codex가 실제 API 검증을 위해 route 배선까지 완료
+  - 모든 데이터 구동 route가 실제 ViewModel 상태·이벤트·effect 사용
+  - 임시 상태와 `Codex 연동 후` 안내 제거
+  - 실제 Gemini 호출 확인만 로컬 API 키 입력 대기

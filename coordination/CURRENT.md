@@ -1,17 +1,17 @@
 # 현재 상태
 
-- 현재 단계: 실제 데이터 배선
-- 현재 담당: Claude 재인계 준비
-- 현재 작업: Codex REQ-002 완료, Compose route 실제 ViewModel 연결 대기
-- 마지막 완료: ViewModel provider, Room/DataStore/Gemini, 실제 학습 세션 로직 연결
-- 기준 커밋: `bc4da61`
-- 검증: `testDebugUnitTest`, `assembleDebug`, `lintDebug` 통과. `connectedDebugAndroidTest` AVD Pixel_7에서 12개 통과(0 실패)
-- 수정 파일: `app/src/main/.../presentation/**`, `app/src/androidTest/.../presentation/**`, `app/build.gradle.kts`, `gradle/libs.versions.toml`, coordination 문서
-- 미완료 부분: `LexiLoopApp.kt` 각 route에서 `LexiLoopApplication.viewModels` 사용
-- 다음 행동: Claude가 표시 계층에서 provider를 수집하고 effect·화면에 연결
+- 현재 단계: 실제 Gemini 호출 직전
+- 현재 담당: Codex
+- 현재 작업: 로컬 API 키 입력 대기
+- 마지막 완료: 임시 route 제거, 실제 목적 분석, 추천 6×50 생성, Room 저장, 재시도 중복 방지
+- 기준 커밋: `8eccae3`
+- 검증: 단위 테스트, assemble, lint 통과. AVD Pixel_7 Android 테스트 13개 통과
+- 수정 파일: Gemini 검증, DAO, presentation route·계약·ViewModel, Android 통합 테스트, 문서
+- 미완료 부분: 실제 Gemini 네트워크 호출 확인
+- 다음 행동: 사용자가 `local.properties`에 키 입력 → 재빌드·설치 → AVD 목적 분석·300개 저장 확인
 - 브랜치: `main`, 원격 `origin` → `https://github.com/yoon778/lexiloop`
 - 보류: 별도 `english` 루트 폴더가 다른 프로세스에 점유됨
-- 블로커: 없음
+- 블로커: `GEMINI_API_KEY` 미입력
 
 ## 작업공간
 

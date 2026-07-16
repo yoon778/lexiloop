@@ -132,6 +132,9 @@ interface LexiLoopDao {
     )
     fun queuedCount(): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM learning_items WHERE generationBatchId IS NOT NULL")
+    suspend fun generatedItemCount(): Int
+
     @Query("SELECT epochDay FROM study_sessions WHERE status = 'COMPLETED' ORDER BY epochDay DESC")
     suspend fun completedSessionEpochDays(): List<Long>
 
@@ -154,6 +157,12 @@ interface LexiLoopDao {
 
     @Query("SELECT * FROM learning_items WHERE id != :itemId ORDER BY id LIMIT :limit")
     suspend fun distractorItems(itemId: String, limit: Int): List<LearningItemEntity>
+
+    @Query(
+        "SELECT expression, partOfSpeech, targetMeaningKo FROM learning_items " +
+            "ORDER BY createdAtMillis DESC LIMIT :limit",
+    )
+    suspend fun blockedCards(limit: Int): List<BlockedCardRow>
 
     @Query(
         """
@@ -225,4 +234,10 @@ data class ManagedWordRow(
     val targetMeaningKo: String,
     val status: LearningStatus,
     val excludedAtMillis: Long?,
+)
+
+data class BlockedCardRow(
+    val expression: String,
+    val partOfSpeech: com.yoon778.lexiloop.domain.model.PartOfSpeech,
+    val targetMeaningKo: String,
 )

@@ -14,10 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
@@ -33,9 +32,8 @@ import com.yoon778.lexiloop.data.settings.UserSettings
 import com.yoon778.lexiloop.platform.tts.EnglishTextToSpeech
 import com.yoon778.lexiloop.presentation.contract.AppRoute
 import com.yoon778.lexiloop.presentation.contract.HomeEvent
-import com.yoon778.lexiloop.presentation.contract.HomeUiState
+import com.yoon778.lexiloop.presentation.contract.LoadState
 import com.yoon778.lexiloop.presentation.contract.OnboardingEvent
-import com.yoon778.lexiloop.presentation.contract.OnboardingUiState
 import com.yoon778.lexiloop.presentation.contract.UiEffect
 import com.yoon778.lexiloop.presentation.screens.DataManagementScreen
 import com.yoon778.lexiloop.presentation.screens.DiagnosisScreen
@@ -44,18 +42,14 @@ import com.yoon778.lexiloop.presentation.screens.NewOverviewScreen
 import com.yoon778.lexiloop.presentation.screens.OnboardingAnalysisScreen
 import com.yoon778.lexiloop.presentation.screens.OnboardingPurposeScreen
 import com.yoon778.lexiloop.presentation.screens.SettingsScreen
+import com.yoon778.lexiloop.presentation.screens.SessionResultScreen
+import com.yoon778.lexiloop.presentation.screens.StudyScreen
 import com.yoon778.lexiloop.presentation.screens.WordManagementScreen
 import com.yoon778.lexiloop.presentation.theme.LexiLoopTheme
 import com.yoon778.lexiloop.presentation.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
 
-/**
- * 앱 루트: 테마 적용 + Navigation 3 호스트.
- *
- * 표시 계층만 소유. 데이터 구동 화면(Home/Study/WordManagement/Onboarding 분석)의 ViewModel
- * 팩토리는 Codex 소유이며 아직 부재하여, 해당 화면은 기본·빈 상태로 표시하고 이동만 배선한다.
- * 요청: coordination/TO_CODEX.md REQ-002. Settings/DataManagement는 실제 SettingsViewModel로 배선.
- */
+/** 앱 루트: 테마 적용 + Navigation 3 호스트. */
 @Composable
 fun LexiLoopApp() {
     val context = LocalContext.current
@@ -95,6 +89,11 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
     val scope = rememberCoroutineScope()
     fun toast(text: String) = scope.launch { snackbar.showSnackbar(text) }.let { }
 
+    val tts = remember { EnglishTextToSpeech(app) }
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        onDispose { tts.close() }
+    }
+
     val nav = remember {
         object {
             fun go(route: AppRoute, clear: Boolean = false) {
@@ -109,6 +108,7 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
                     is UiEffect.Navigate -> go(effect.route, effect.clearBackStack)
                     UiEffect.NavigateBack -> back()
                     is UiEffect.Message -> toast(effect.text)
+                    is UiEffect.Speak -> if (!tts.speak(effect.text)) toast("발음을 재생할 수 없어요")
                     UiEffect.LaunchJsonExport, UiEffect.LaunchJsonImport ->
                         toast("데이터 내보내기·가져오기는 준비 중이에요")
                     UiEffect.RequestNotificationPermission -> Unit
@@ -118,11 +118,12 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
         }
     }
 
-    // TTS: 발음 재생. Study VM 배선 전이라도 발음 효과는 동작하도록 준비.
-    val tts = remember { EnglishTextToSpeech(app) }
-    androidx.compose.runtime.DisposableEffect(Unit) {
-        onDispose { tts.close() }
-    }
+    val onboardingVm = remember { app.viewModels.onboarding() }
+    val onboardingState by onboardingVm.state.collectAsStateWithLifecycle()
+    val homeVm = remember { app.viewModels.home() }
+    val homeState by homeVm.state.collectAsStateWithLifecycle()
+    LaunchedEffect(onboardingVm) { onboardingVm.effects.collect(nav::handle) }
+    LaunchedEffect(homeVm) { homeVm.effects.collect(nav::handle) }
 
     Scaffold(snackbarHost = { SnackbarHost(snackbar) }) { padding ->
         NavDisplay(
@@ -131,68 +132,73 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
             onBack = { nav.back() },
             entryProvider = entryProvider {
                 entry<AppRoute.OnboardingPurpose> {
-                    OnboardingPurposeRoute(onEvent = { ev ->
-                        when (ev) {
-                            OnboardingEvent.AnalyzeRequested, OnboardingEvent.RetryRequested ->
-                                toast("목적 분석은 Codex Gemini 연동 후 동작해요")
-                            OnboardingEvent.UseStarterDeck -> nav.go(AppRoute.Diagnosis)
-                            else -> Unit
-                        }
-                    })
+                    OnboardingPurposeScreen(
+                        state = onboardingState,
+                        onEvent = onboardingVm::onEvent,
+                    )
                 }
                 entry<AppRoute.OnboardingAnalysis> {
                     OnboardingAnalysisScreen(
-                        analysis = null,
-                        onAccept = { nav.go(AppRoute.Diagnosis) },
+                        analysis = onboardingState.analysis,
+                        onAccept = { onboardingVm.onEvent(OnboardingEvent.AnalysisAccepted) },
                         onBack = { nav.back() },
-                        onRetry = { toast("목적 분석은 Codex Gemini 연동 후 동작해요") },
-                        onUseStarter = { nav.go(AppRoute.Diagnosis) },
+                        onRetry = { onboardingVm.onEvent(OnboardingEvent.RetryRequested) },
+                        onUseStarter = { onboardingVm.onEvent(OnboardingEvent.UseStarterDeck) },
+                        isGenerating = onboardingState.isGenerating,
                     )
                 }
                 entry<AppRoute.Diagnosis> {
                     DiagnosisScreen(
-                        word = "maintain",
-                        index = 1,
-                        total = 20,
-                        onAnswer = { nav.go(AppRoute.Home, clear = true) },
+                        word = onboardingState.diagnosisWord,
+                        index = onboardingState.diagnosisIndex,
+                        total = onboardingState.diagnosisTotal,
+                        onAnswer = { onboardingVm.onEvent(OnboardingEvent.DiagnosisAnswered(it)) },
                         onBack = { nav.back() },
                     )
                 }
                 entry<AppRoute.Home> {
+                    LaunchedEffect(Unit) { homeVm.onEvent(HomeEvent.Refresh) }
                     HomeScreen(
-                        state = HomeUiState(isLoading = false, dailyNewGoal = settings.dailyNewCount),
-                        onEvent = { ev ->
-                            when (ev) {
-                                HomeEvent.OpenSettings -> nav.go(AppRoute.Settings)
-                                HomeEvent.OpenWordManagement -> nav.go(AppRoute.WordManagement)
-                                HomeEvent.OpenNewOverview -> nav.go(AppRoute.NewOverview)
-                                HomeEvent.StartReview -> toast("복습 세션은 Codex 연동 후 동작해요")
-                                HomeEvent.GenerateMoreRequested -> toast("추천 생성 확인이 필요해요")
-                                else -> Unit
-                            }
-                        },
+                        state = homeState,
+                        onEvent = homeVm::onEvent,
                     )
                 }
                 entry<AppRoute.NewOverview> {
+                    val words = (homeState.newItems as? LoadState.Content)?.value.orEmpty()
                     NewOverviewScreen(
-                        words = emptyList(),
-                        onStart = { toast("신규 세션은 Codex 연동 후 동작해요") },
+                        words = words,
+                        onStart = { homeVm.onEvent(HomeEvent.StartNew) },
                         onBack = { nav.back() },
                     )
                 }
                 entry<AppRoute.Study> { route ->
-                    // Study VM(initialState/reduce)은 Codex 소유. 배선 전 안내만 표시.
-                    PlaceholderScreen("학습 세션 준비 중\n(session ${route.sessionId})")
+                    val vm = remember(route.sessionId) { app.viewModels.study(route.sessionId) }
+                    val state by vm.state.collectAsStateWithLifecycle()
+                    LaunchedEffect(vm) { vm.effects.collect(nav::handle) }
+                    if (state.isLoading) {
+                        PlaceholderScreen("학습 세션을 불러오는 중")
+                    } else {
+                        StudyScreen(state, vm::onEvent, nav::back)
+                    }
                 }
-                entry<AppRoute.SessionResult> {
-                    PlaceholderScreen("학습 결과 준비 중")
+                entry<AppRoute.SessionResult> { route ->
+                    val result by produceState<com.yoon778.lexiloop.presentation.contract.SessionResultUiState?>(
+                        initialValue = null,
+                        key1 = route.sessionId,
+                    ) {
+                        value = runCatching { app.viewModels.sessionResult(route.sessionId) }.getOrNull()
+                    }
+                    result?.let { state ->
+                        SessionResultScreen(state, onHome = { nav.go(AppRoute.Home, clear = true) })
+                    } ?: PlaceholderScreen("학습 결과를 불러오는 중")
                 }
                 entry<AppRoute.WordManagement> {
+                    val vm = remember { app.viewModels.words() }
+                    val state by vm.state.collectAsStateWithLifecycle()
+                    LaunchedEffect(vm) { vm.effects.collect(nav::handle) }
                     WordManagementScreen(
-                        state = com.yoon778.lexiloop.presentation.contract.WordManagementUiState(
-                            words = com.yoon778.lexiloop.presentation.contract.LoadState.Empty("단어가 아직 없어요"),
-                        ),
-                        onEvent = {},
+                        state = state,
+                        onEvent = vm::onEvent,
                         onBack = { nav.back() },
                     )
                 }
@@ -205,24 +211,6 @@ private fun AppNavHost(app: LexiLoopApplication, settings: UserSettings) {
             },
         )
     }
-}
-
-/** 온보딩 입력은 순수 UI 상태라 로컬에서 관리 (Gemini 분석만 Codex 대기). */
-@Composable
-private fun OnboardingPurposeRoute(onEvent: (OnboardingEvent) -> Unit) {
-    var state by remember { mutableStateOf(OnboardingUiState()) }
-
-    OnboardingPurposeScreen(
-        state = state,
-        onEvent = { ev ->
-            when (ev) {
-                is OnboardingEvent.PurposeChanged -> state = state.copy(purposeText = ev.value.take(1_000))
-                is OnboardingEvent.DifficultySelected -> state = state.copy(difficulty = ev.value)
-                is OnboardingEvent.DailyNewCountSelected -> state = state.copy(dailyNewCount = ev.value)
-                else -> onEvent(ev)
-            }
-        },
-    )
 }
 
 @Composable

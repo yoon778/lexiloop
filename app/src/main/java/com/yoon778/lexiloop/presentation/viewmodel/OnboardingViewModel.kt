@@ -16,6 +16,7 @@ import java.util.UUID
 class OnboardingViewModel(
     private val analyze: suspend (PurposeAnalysisRequest) -> PurposeAnalysisResponse,
     private val saveProfile: suspend (RecommendationProfile) -> Unit,
+    private val generateRecommendations: suspend (RecommendationProfile) -> Unit,
     private val completeOnboarding: suspend (String, Int, RecommendationProfile) -> Unit,
 ) : ContractViewModel<OnboardingUiState, OnboardingEvent>(OnboardingUiState()) {
     override fun onEvent(event: OnboardingEvent) {
@@ -70,9 +71,17 @@ class OnboardingViewModel(
         val current = state.value
         val profile = (current.analysis as? LoadState.Content)?.value ?: return
         viewModelScope.launch {
-            runCatching { saveProfile(profile) }
-                .onSuccess { emit(UiEffect.Navigate(AppRoute.Diagnosis)) }
-                .onFailure { emit(UiEffect.Message("설정을 저장하지 못했어요")) }
+            mutableState.value = current.copy(isGenerating = true)
+            runCatching {
+                saveProfile(profile)
+                generateRecommendations(profile)
+            }.onSuccess {
+                mutableState.value = state.value.copy(isGenerating = false)
+                emit(UiEffect.Navigate(AppRoute.Diagnosis))
+            }.onFailure {
+                mutableState.value = state.value.copy(isGenerating = false)
+                emit(UiEffect.Message("단어 생성에 실패했어요. API 키와 네트워크를 확인해주세요"))
+            }
         }
     }
 

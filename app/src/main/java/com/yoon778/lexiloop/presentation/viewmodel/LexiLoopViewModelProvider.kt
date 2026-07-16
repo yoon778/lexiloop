@@ -2,6 +2,10 @@ package com.yoon778.lexiloop.presentation.viewmodel
 
 import com.yoon778.lexiloop.data.gemini.GeminiCallResult
 import com.yoon778.lexiloop.data.gemini.GeminiRepository
+import com.yoon778.lexiloop.data.gemini.BlockedCard
+import com.yoon778.lexiloop.data.gemini.RecommendationRequest
+import com.yoon778.lexiloop.data.gemini.RecommendationResponse
+import com.yoon778.lexiloop.data.gemini.RecommendationTopicAllocation
 import com.yoon778.lexiloop.data.local.LexiLoopDatabase
 import com.yoon778.lexiloop.data.local.entity.LearningItemEntity
 import com.yoon778.lexiloop.data.local.entity.SessionItemEntity
@@ -14,9 +18,12 @@ import com.yoon778.lexiloop.domain.learning.answerHint
 import com.yoon778.lexiloop.domain.learning.isEnglishAnswerCorrect
 import com.yoon778.lexiloop.domain.learning.nextLearningStep
 import com.yoon778.lexiloop.domain.model.LearningPhase
+import com.yoon778.lexiloop.domain.model.LearningItemDraft
 import com.yoon778.lexiloop.domain.model.ReviewOutcome
 import com.yoon778.lexiloop.domain.model.SessionType
 import com.yoon778.lexiloop.domain.progress.calculateStreak
+import com.yoon778.lexiloop.domain.recommendation.TopicWeight
+import com.yoon778.lexiloop.domain.recommendation.allocateTopicCounts
 import com.yoon778.lexiloop.presentation.contract.AppRoute
 import com.yoon778.lexiloop.presentation.contract.HomeUiState
 import com.yoon778.lexiloop.presentation.contract.LoadState
@@ -46,10 +53,13 @@ class LexiLoopViewModelProvider(
         analyze = { request ->
             when (val result = geminiRepository.analyzePurpose(request)) {
                 is GeminiCallResult.Success -> result.value
-                is GeminiCallResult.Failure -> throw IOException(result.error.code.name)
+                is GeminiCallResult.Failure -> throw IOException(
+                    "${result.error.code.name}:${result.error.fieldPath}",
+                )
             }
         },
         saveProfile = settingsRepository::setRecommendationProfile,
+        generateRecommendations = ::generateStarterDeck,
         completeOnboarding = settingsRepository::setOnboarding,
     )
 
@@ -99,6 +109,44 @@ class LexiLoopViewModelProvider(
             sessionType = session.type,
             completedCount = dao.completedSessionItemCount(sessionId),
         )
+    }
+
+    internal suspend fun generateStarterDeck(profile: com.yoon778.lexiloop.data.settings.RecommendationProfile) {
+        require(profile.topics.isNotEmpty())
+        val allocations = allocateTopicCounts(
+            topics = profile.topics.map { TopicWeight(it.id, it.name, it.weightPercent) },
+            requestedCount = 50,
+        ).map { RecommendationTopicAllocation(it.topicId, it.name, it.count) }
+        val topicNames = profile.topics.associate { it.id to it.name }
+        val blocked = dao.blockedCards(1_000).map {
+            BlockedCard(it.expression, it.partOfSpeech, it.targetMeaningKo)
+        }.toMutableList()
+
+        val missingCount = (INITIAL_CARD_COUNT - dao.generatedItemCount()).coerceAtLeast(0)
+        val missingBatchCount = (missingCount + RECOMMENDATION_BATCH_SIZE - 1) / RECOMMENDATION_BATCH_SIZE
+        repeat(missingBatchCount) {
+            val request = RecommendationRequest(
+                requestId = java.util.UUID.randomUUID().toString(),
+                difficulty = profile.difficulty,
+                topicAllocations = allocations,
+                excludedTopics = profile.excludedTopics,
+                blockedCards = blocked.takeLast(1_000),
+            )
+            val response = when (val result = geminiRepository.generateRecommendations(request)) {
+                is GeminiCallResult.Success -> result.value
+                is GeminiCallResult.Failure -> throw IOException(
+                    "${result.error.code.name}:${result.error.fieldPath}",
+                )
+            }
+            learningRepository.insertBatch(
+                drafts = response.toDrafts(topicNames),
+                generationBatchId = request.requestId,
+                nowMillis = nowMillis(),
+            )
+            blocked += response.items.map {
+                BlockedCard(it.expression, it.partOfSpeech, it.targetMeaningKo)
+            }
+        }
     }
 
     private suspend fun loadHome(): HomeUiState {
@@ -321,4 +369,35 @@ class LexiLoopViewModelProvider(
         phase = LearningPhase.DONE,
         canGoBack = false,
     )
+
+    private companion object {
+        const val INITIAL_CARD_COUNT = 300
+        const val RECOMMENDATION_BATCH_SIZE = 50
+    }
 }
+
+private fun RecommendationResponse.toDrafts(topicNames: Map<String, String>): List<LearningItemDraft> =
+    items.map { item ->
+        LearningItemDraft(
+            expression = item.expression,
+            baseForm = item.baseForm,
+            itemType = item.itemType,
+            partOfSpeech = item.partOfSpeech,
+            targetMeaningKo = item.targetMeaningKo,
+            auxiliaryMeaningsKo = item.auxiliaryMeaningsKo,
+            phonetic = null,
+            exampleSentence = item.example.template.replace("{{target}}", item.example.targetForm),
+            exampleTranslationKo = item.example.translationKo,
+            exampleTargetForm = item.example.targetForm,
+            topic = requireNotNull(topicNames[item.topicId]),
+            difficulty = item.difficulty,
+            meaningSourceName = "Gemini draft",
+            meaningSourceUrl = null,
+            meaningLicenseName = null,
+            meaningLicenseUrl = null,
+            exampleSourceName = "Gemini generated",
+            exampleSourceUrl = null,
+            exampleLicenseName = null,
+            exampleLicenseUrl = null,
+        )
+    }

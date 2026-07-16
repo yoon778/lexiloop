@@ -87,7 +87,7 @@ LoadState<T>
 `OnboardingUiState`
 
 - `purposeText`, `difficulty`, `dailyNewCount`
-- `isSubmitEnabled`, `isAnalyzing`, `fieldErrors`
+- `isSubmitEnabled`, `isAnalyzing`, `isGenerating`, `fieldErrors`
 - `diagnosisWord`, `diagnosisIndex`, `diagnosisTotal`
 
 `OnboardingEvent`
@@ -112,6 +112,7 @@ LoadState<T>
 - 분석 결과는 수정 폼이 아니라 확인 화면
 - 변경은 이전 화면으로 돌아가 원문 수정
 - 생성 실패 시 기존 분석 유지, 재시도와 기본 단어장 선택 제공
+- 생성 중 `이대로 생성` 버튼 비활성화와 진행 상태 표시
 
 ## 3. 수준 진단
 
